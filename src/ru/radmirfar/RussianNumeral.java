@@ -134,10 +134,10 @@ public class RussianNumeral {
     /**
      * Выдаёт дробное количественное числительное в нужном падеже.
      * @param num десятичная дробь
-     * @param gram_case падеж
+     * @param gramCase падеж
      * @return число прописью
      */
-    public static String getNumeral(double num, Case gram_case) {
+    public static String getNumeral(double num, Case gramCase) {
         String res = "";
         return res;
     }
@@ -145,12 +145,33 @@ public class RussianNumeral {
     /**
      * Выдаёт дробное количественное числительное в нужном падеже.
      * @param num простая или смешанная дробь
-     * @param gram_case падеж
+     * @param gramCase падеж
      * @return число прописью
      */
-    public static String getNumeral(Fraction num, Case gram_case) {
+    public static String getNumeral(Fraction num, Case gramCase) {
         String res = "";
         return res;
+    }
+
+    /**
+     * Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
+     * падежа и одушевлённости существительного, к которому относится числительное.
+     * @param gender грамматический род
+     * @param gramCase падеж
+     * @param animacy одушевлённость существительного, к которому относится числительное
+     * @return числительное <i>оба</i> в нужной форме
+     */
+    public static String getBoth(Gender gender, Case gramCase, Animacy animacy) {
+        String res = "об";
+        String[][] endings = new String[2][6];
+        endings[0] = new String[] {"а", "оих", "оим", "-", "оими", "оих"};
+        endings[1] = new String[] {"е", "еих", "еим", "-", "еими", "еих"};
+        int base = gender == Gender.FEMININE ? 1 : 0;
+        if (gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+            if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
+            return res + endings[base][Case.NOMINATIVE.ordinal()];
+        }
+        return res + endings[base][gramCase.ordinal()];
     }
     /**
      * Выдаёт порядковое числительное в нужной форме.
