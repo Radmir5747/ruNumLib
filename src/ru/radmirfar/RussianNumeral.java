@@ -115,4 +115,43 @@ public class RussianNumeral {
          */
         INANIMATE
     }
+
+    /**
+     * Выдаёт число прописью.
+     * @param num число
+     * @param gender грамматический род
+     * @param gramCase падеж
+     * @param type разряд числительного
+     * @param count грамматическое число
+     * @return число прописью
+     */
+    public static String getNumeral(int num, Gender gender, Case gramCase, Type type, Count count) {
+        if (type == Type.CARDINAL) return getCardinalNumeral(num, gender, gramCase, count);
+        return getOrdinalNumeral(num, gender, gramCase, count);
+    }
+
+    /**
+     * Выдаёт порядковое числительное в нужной форме.
+     * @param num число
+     * @param gender грамматический род
+     * @param gramCase падеж
+     * @param count грамматическое число
+     * @return число прописью
+     */
+    private static String getOrdinalNumeral(int num, Gender gender, Case gramCase, Count count) {
+        String res = "";
+        return res;
+    }
+    /**
+     * Выдаёт количественное числительное в нужной форме.
+     * @param num число
+     * @param gender грамматический род
+     * @param gramCase падеж
+     * @param count грамматическое число
+     * @return число прописью
+     */
+    private static String getCardinalNumeral(int num, Gender gender, Case gramCase, Count count) {
+        String res = "";
+        return res;
+    }
 }
