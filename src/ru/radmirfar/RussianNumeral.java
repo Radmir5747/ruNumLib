@@ -154,6 +154,36 @@ public class RussianNumeral {
     }
 
     /**
+     * <p>Выдаёт количественное собирательное числительное прописью в нужной форме.</p>
+     * <p>При передаче числа, не принадлежащего интервалу [2;10], выдаёт исключение
+     * (т.к. собирательные числительные больше десяти не употребляются,
+     * а меньше двух не бывают).</p>
+     *
+     * @param num число от 2 до 10
+     * @param gram_case падеж
+     * @param animacy одушевлённость существительного, к которому относится числительное
+     * @throws IllegalArgumentException если число меньше 2 или больше 10
+     * @return число прописью
+     */
+    public static String getCollectiveNumeral(int num, Case gram_case, Animacy animacy) {
+        if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
+        String res = "";
+        String[][] endings = new String[2][6];
+        endings[0] = new String[]{"е", "их", "им", "-", "ими", "их"}; // мягкая основа
+        endings[1] = new String[]{"о", "ых", "ым", "-", "ыми", "ых"}; // твёрдая основа
+        String[] numerals = new String[]{"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
+        res = numerals[num - 2];
+        int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
+        if (gram_case == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+            // одушевлённое - окончание как у родительного падежа
+            // неодушевлённое - как у именительного падежа
+            if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
+            return res + endings[base][Case.NOMINATIVE.ordinal()];
+        }
+        return res + endings[base][gram_case.ordinal()];
+    }
+
+    /**
      * Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
      * падежа и одушевлённости существительного, к которому относится числительное.
      * @param gender грамматический род
