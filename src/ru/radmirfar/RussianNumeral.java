@@ -160,12 +160,12 @@ public class RussianNumeral {
      * а меньше двух не бывают).</p>
      *
      * @param num число от 2 до 10
-     * @param gram_case падеж
+     * @param gramCase падеж
      * @param animacy одушевлённость существительного, к которому относится числительное
      * @throws IllegalArgumentException если число меньше 2 или больше 10
      * @return число прописью
      */
-    public static String getCollectiveNumeral(int num, Case gram_case, Animacy animacy) {
+    public static String getCollectiveNumeral(int num, Case gramCase, Animacy animacy) {
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
         String res = "";
         String[][] endings = new String[2][6];
@@ -174,13 +174,13 @@ public class RussianNumeral {
         String[] numerals = new String[]{"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
         res = numerals[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
-        if (gram_case == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+        if (gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
             // одушевлённое - окончание как у родительного падежа
             // неодушевлённое - как у именительного падежа
             if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
             return res + endings[base][Case.NOMINATIVE.ordinal()];
         }
-        return res + endings[base][gram_case.ordinal()];
+        return res + endings[base][gramCase.ordinal()];
     }
 
     /**
@@ -225,6 +225,20 @@ public class RussianNumeral {
      */
     private static String getCardinalNumeral(int num, Gender gender, Case gramCase, Count count) {
         String res = "";
+        if (num == 1000) {
+            String base = "тысяч";
+            String[][] endings = new String[2][6];
+            endings[0] = new String[]{"а", "и", "е", "у", "ей", "е"};
+            endings[1] = new String[]{"и", "", "ам", "и", "ами", "ах"};
+            return base + endings[count.ordinal()][gramCase.ordinal()];
+        }
+        if (num == 10e5 || num == 10e8) {
+            String base = num == 10e5 ? "миллион" : "миллиард";
+            String[][] endings = new String[2][6];
+            endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
+            endings[1] = new String[]{"ы", "ов", "ам", "ы", "ами", "ах"};
+            return base + endings[count.ordinal()][gramCase.ordinal()];
+        }
         return res;
     }
 
