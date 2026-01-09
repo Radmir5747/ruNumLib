@@ -237,10 +237,11 @@ public class RussianNumeral {
      */
     private static String getCardinalNumeral(int num, Declension d) {
         // TODO: выдавать исключения в зависимости от числа
-        if (d.gender == null || d.gramCase == null || d.count == null || d.animacy == null)
+        if (d.gramCase == null || d.animacy == null)
             throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
         if (num == 1000) {
+            if (d.count == null) throw new IllegalArgumentException("Insufficient arguments");
             String base = "тысяч";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"а", "и", "е", "у", "ей", "е"};
@@ -248,6 +249,7 @@ public class RussianNumeral {
             return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 10e5 || num == 10e8) {
+            if (d.count == null) throw new IllegalArgumentException("Insufficient arguments");
             String base = num == 10e5 ? "миллион" : "миллиард";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
@@ -255,20 +257,48 @@ public class RussianNumeral {
             return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 1) {
+            if (d.count == null || d.gender == null) throw new IllegalArgumentException("Insufficient arguments");
             String base = "од";
             String[][] endings = new String[4][6];
-            endings[0] = new String[]{"ин", "ного", "ому", "", "ним", "ном"};
+            endings[0] = new String[]{"ин", "ного", "ному", "", "ним", "ном"};
             endings[1] = new String[]{"на", "ной", "ной", "ну", "ной", "ной"};
             endings[2] = new String[]{"но", "ного", "ному", "но", "ним", "ном"};
             endings[3] = new String[]{"ни", "них", "ним", "", "ними", "них"};
             int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal();
             if (d.gramCase == Case.ACCUSATIVE && (d.gender == Gender.MASCULINE || d.count == Count.PLURAL)) {
-                if (d.animacy == Animacy.ANIMATE) return base + endings[ending][Case.GENITIVE.ordinal()];
-                return base + endings[ending][Case.NOMINATIVE.ordinal()];
+                return modifyForAnimacy(base, endings[ending], d);
             }
             return base + endings[ending][d.gramCase.ordinal()];
         }
+        if (num > 1 && num < 5) { // 2, 3, 4
+            if (num == 2 && d.gender == null) throw new IllegalArgumentException("Insufficient arguments");
+            String[] numerals = new String[]{"дв", "тр", "четыр"};
+            String[][] endings = new String[4][6];
+            endings[0] = new String[]{"а", "ух", "ум", "", "умя", "ух"};
+            endings[1] = new String[]{"е", "ух", "ум", "", "умя", "ух"};
+            endings[2] = new String[]{"и", "ёх", "ём", "", "емя", "ёх"};
+            endings[3] = new String[]{"е", "ёх", "ём", "", "ьмя", "ёх"};
+            int ending = num - 1;
+            if (num == 2) ending = d.gender == Gender.FEMININE ? 1 : 0; // учитываем род для числ. 2
+            if (d.gramCase == Case.ACCUSATIVE) {
+                return modifyForAnimacy(numerals[num - 2], endings[ending], d);
+            }
+            return numerals[num - 2] + endings[ending][d.gramCase.ordinal()];
+        }
         return res;
+    }
+
+    /**
+     * Вспомогательная функция, выдаёт нужную форму числительного в винительном падеже в зависимости
+     * от одушевлённости.
+     * @param base основа числительного
+     * @param endings набор окончаний
+     * @param d грамматические признаки (одушевлённость)
+     * @return число прописью
+     */
+    private static String modifyForAnimacy(String base, String[] endings, Declension d) {
+        if (d.animacy == Animacy.ANIMATE) return base + endings[Case.GENITIVE.ordinal()];
+        return base + endings[Case.NOMINATIVE.ordinal()];
     }
 
     /**
