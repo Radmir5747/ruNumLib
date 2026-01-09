@@ -4,9 +4,9 @@ public class RussianNumeral {
     /**
      * <p>Грамматический род:</p>
      * <ul>
-     * <li>MASCULINE - мужской</li>
-     * <li>FEMININE - женский</li>
-     * <li>NEUTRAL - средний</li>
+     * <li>{@link #MASCULINE} - мужской</li>
+     * <li>{@link #FEMININE} - женский</li>
+     * <li>{@link #NEUTRAL} - средний</li>
      * </ul>
      */
     public enum Gender {
@@ -27,12 +27,12 @@ public class RussianNumeral {
     /**
      * <p>Падеж:</p>
      * <ul>
-     * <li>NOMINATIVE - именительный</li>
-     * <li>GENITIVE - родительный</li>
-     * <li>DATIVE - дательный</li>
-     * <li>ACCUSATIVE - винительный</li>
-     * <li>INSTRUMENTAL - творительный</li>
-     * <li>PREPOSITIONAL - предложный</li>
+     * <li>{@link #NOMINATIVE} - именительный</li>
+     * <li>{@link #GENITIVE} - родительный</li>
+     * <li>{@link #DATIVE} - дательный</li>
+     * <li>{@link #ACCUSATIVE} - винительный</li>
+     * <li>{@link #INSTRUMENTAL} - творительный</li>
+     * <li>{@link #PREPOSITIONAL} - предложный</li>
      * </ul>
      */
     public enum Case {
@@ -65,8 +65,8 @@ public class RussianNumeral {
     /**
      * <p>Число (для числительных типа один, тысяча):</p>
      * <ul>
-     * <li>SINGULAR - единственное</li>
-     * <li>PLURAL - множественное</li>
+     * <li>{@link #SINGULAR} - единственное</li>
+     * <li>{@link #PLURAL} - множественное</li>
      * </ul>
      */
     public enum Count {
@@ -83,8 +83,8 @@ public class RussianNumeral {
     /**
      * <p>Разряд числительного:</p>
      * <ul>
-     * <li>CARDINAL - количественное</li>
-     * <li>ORDINAL - порядковое</li>
+     * <li>{@link #CARDINAL} - количественное</li>
+     * <li>{@link #ORDINAL} - порядковое</li>
      * </ul>
      */
     public enum Type {
@@ -101,8 +101,8 @@ public class RussianNumeral {
     /**
      * <p>Одушевлённость существительного, к которому относится числительное:</p>
      * <ul>
-     * <li>ANIMATE - одушевлённое</li>
-     * <li>INANIMATE - неодушевлённое</li>
+     * <li>{@link #ANIMATE} - одушевлённое</li>
+     * <li>{@link #INANIMATE} - неодушевлённое</li>
      * </ul>
      */
     public enum Animacy {
@@ -119,14 +119,14 @@ public class RussianNumeral {
     /**
      * Выдаёт число прописью.
      * @param num число
-     * @param gender грамматический род
+     * @param gender род
      * @param gramCase падеж
      * @param type разряд числительного
      * @param count грамматическое число
      * @return число прописью
      */
-    public static String getNumeral(int num, Gender gender, Case gramCase, Type type, Count count) {
-        if (type == Type.CARDINAL) return getCardinalNumeral(num, gender, gramCase, count);
+    public static String getNumeral(int num, Gender gender, Case gramCase, Type type, Count count, Animacy animacy) {
+        if (type == Type.CARDINAL) return getCardinalNumeral(num, gender, gramCase, count, animacy);
         return getOrdinalNumeral(num, gender, gramCase, count);
     }
 
@@ -169,8 +169,8 @@ public class RussianNumeral {
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
         String res = "";
         String[][] endings = new String[2][6];
-        endings[0] = new String[]{"е", "их", "им", "-", "ими", "их"}; // мягкая основа
-        endings[1] = new String[]{"о", "ых", "ым", "-", "ыми", "ых"}; // твёрдая основа
+        endings[0] = new String[]{"е", "их", "им", "", "ими", "их"}; // мягкая основа
+        endings[1] = new String[]{"о", "ых", "ым", "", "ыми", "ых"}; // твёрдая основа
         String[] numerals = new String[]{"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
         res = numerals[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
@@ -186,7 +186,7 @@ public class RussianNumeral {
     /**
      * Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
      * падежа и одушевлённости существительного, к которому относится числительное.
-     * @param gender грамматический род
+     * @param gender род
      * @param gramCase падеж
      * @param animacy одушевлённость существительного, к которому относится числительное
      * @return числительное <i>оба</i> в нужной форме
@@ -194,8 +194,8 @@ public class RussianNumeral {
     public static String getBoth(Gender gender, Case gramCase, Animacy animacy) {
         String res = "об";
         String[][] endings = new String[2][6];
-        endings[0] = new String[] {"а", "оих", "оим", "-", "оими", "оих"};
-        endings[1] = new String[] {"е", "еих", "еим", "-", "еими", "еих"};
+        endings[0] = new String[] {"а", "оих", "оим", "", "оими", "оих"};
+        endings[1] = new String[] {"е", "еих", "еим", "", "еими", "еих"};
         int base = gender == Gender.FEMININE ? 1 : 0;
         if (gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
             if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
@@ -206,7 +206,7 @@ public class RussianNumeral {
     /**
      * Выдаёт порядковое числительное в нужной форме.
      * @param num число
-     * @param gender грамматический род
+     * @param gender род
      * @param gramCase падеж
      * @param count грамматическое число
      * @return число прописью
@@ -218,12 +218,12 @@ public class RussianNumeral {
     /**
      * Выдаёт количественное числительное в нужной форме.
      * @param num число
-     * @param gender грамматический род
+     * @param gender род
      * @param gramCase падеж
      * @param count грамматическое число
      * @return число прописью
      */
-    private static String getCardinalNumeral(int num, Gender gender, Case gramCase, Count count) {
+    private static String getCardinalNumeral(int num, Gender gender, Case gramCase, Count count, Animacy animacy) {
         String res = "";
         if (num == 1000) {
             String base = "тысяч";
@@ -238,6 +238,20 @@ public class RussianNumeral {
             endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
             endings[1] = new String[]{"ы", "ов", "ам", "ы", "ами", "ах"};
             return base + endings[count.ordinal()][gramCase.ordinal()];
+        }
+        if (num == 1) {
+            String base = "од";
+            String[][] endings = new String[4][6];
+            endings[0] = new String[]{"ин", "ного", "ому", "", "ним", "ном"};
+            endings[1] = new String[]{"на", "ной", "ной", "ну", "ной", "ной"};
+            endings[2] = new String[]{"но", "ного", "ному", "но", "ним", "ном"};
+            endings[3] = new String[]{"ни", "них", "ним", "", "ними", "них"};
+            int ending = count == Count.PLURAL ? 3 : gender.ordinal();
+            if (gramCase == Case.ACCUSATIVE && (gender == Gender.MASCULINE || count == Count.PLURAL)) {
+                if (animacy == Animacy.ANIMATE) return base + endings[ending][Case.GENITIVE.ordinal()];
+                return base + endings[ending][Case.NOMINATIVE.ordinal()];
+            }
+            return base + endings[ending][gramCase.ordinal()];
         }
         return res;
     }
