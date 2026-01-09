@@ -119,53 +119,61 @@ public class RussianNumeral {
     /**
      * Выдаёт число прописью.
      * @param num число
-     * @param gender род
-     * @param gramCase падеж
-     * @param type разряд числительного
-     * @param count грамматическое число
+     * @param d грамматические признаки (тип числительного, род, падеж, грамматическое число, одушевлённость)
      * @return число прописью
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
-    public static String getNumeral(int num, Gender gender, Case gramCase, Type type, Count count, Animacy animacy) {
-        if (type == Type.CARDINAL) return getCardinalNumeral(num, gender, gramCase, count, animacy);
-        return getOrdinalNumeral(num, gender, gramCase, count);
+    public static String getNumeral(int num, Declension d) {
+        if (d.type == null) throw new IllegalArgumentException("Insufficient arguments");
+        if (d.type == Type.CARDINAL) return getCardinalNumeral(num, d);
+        return getOrdinalNumeral(num, d);
     }
 
     /* дробные числительные бывают только количественными */
     /**
-     * Выдаёт дробное количественное числительное в нужном падеже.
+     * <p>Выдаёт дробное количественное числительное в нужном падеже.</p>
+     * <p>При отсутствии падежа выдаёт исключение.</p>
      * @param num десятичная дробь
-     * @param gramCase падеж
+     * @param d грамматические признаки (падеж)
      * @return число прописью
+     * @throws IllegalArgumentException если отсутствует падеж
      */
-    public static String getNumeral(double num, Case gramCase) {
+    public static String getNumeral(double num, Declension d) {
+        if (d.gramCase == null) throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
         return res;
     }
 
     /**
-     * Выдаёт дробное количественное числительное в нужном падеже.
+     * <p>Выдаёт дробное количественное числительное в нужном падеже.</p>
+     * <p>При отсутствии падежа выдаёт исключение.</p>
      * @param num простая или смешанная дробь
-     * @param gramCase падеж
+     * @param d грамматические признаки (падеж)
      * @return число прописью
+     * @throws IllegalArgumentException если отсутствует падеж
      */
-    public static String getNumeral(Fraction num, Case gramCase) {
+    public static String getNumeral(Fraction num, Declension d) {
+        if (d.gramCase == null) throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
         return res;
     }
 
     /**
      * <p>Выдаёт количественное собирательное числительное прописью в нужной форме.</p>
+     * <p>Необходимо передать падеж и одушевлённость существительного, к которому относится
+     * числительное, иначе выдаёт исключение.</p>
      * <p>При передаче числа, не принадлежащего интервалу [2;10], выдаёт исключение
      * (т.к. собирательные числительные больше десяти не употребляются,
      * а меньше двух не бывают).</p>
      *
      * @param num число от 2 до 10
-     * @param gramCase падеж
-     * @param animacy одушевлённость существительного, к которому относится числительное
-     * @throws IllegalArgumentException если число меньше 2 или больше 10
+     * @param d грамматические характеристики числительного (падеж, одушевлённость)
      * @return число прописью
+     * @throws IllegalArgumentException если число меньше 2 или больше 10; отсутствуют
+     * необходимые грамматические характеристики.
      */
-    public static String getCollectiveNumeral(int num, Case gramCase, Animacy animacy) {
+    public static String getCollectiveNumeral(int num, Declension d) {
+        if (d.gramCase == null || d.animacy == null) throw new IllegalArgumentException("Insufficient arguments");
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
         String res = "";
         String[][] endings = new String[2][6];
@@ -174,70 +182,77 @@ public class RussianNumeral {
         String[] numerals = new String[]{"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
         res = numerals[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
-        if (gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+        if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
             // одушевлённое - окончание как у родительного падежа
             // неодушевлённое - как у именительного падежа
-            if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
+            if (d.animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
             return res + endings[base][Case.NOMINATIVE.ordinal()];
         }
-        return res + endings[base][gramCase.ordinal()];
+        return res + endings[base][d.gramCase.ordinal()];
     }
 
     /**
-     * Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
-     * падежа и одушевлённости существительного, к которому относится числительное.
-     * @param gender род
-     * @param gramCase падеж
-     * @param animacy одушевлённость существительного, к которому относится числительное
+     * <p>Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
+     * падежа и одушевлённости существительного, к которому относится числительное.</p>
+     * <p>Необходимо передать падеж, род, в случае винительного падежа также
+     * одушевлённость существительного, к которому относится числительное, иначе выдаёт исключение.</p>
+     * @param d грамматические характеристики числительного (род, падеж, одушевлённость)
      * @return числительное <i>оба</i> в нужной форме
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
-    public static String getBoth(Gender gender, Case gramCase, Animacy animacy) {
+    public static String getBoth(Declension d) {
+        if (d.gender == null || d.gramCase == null)
+            throw new IllegalArgumentException("Insufficient arguments");
         String res = "об";
         String[][] endings = new String[2][6];
         endings[0] = new String[] {"а", "оих", "оим", "", "оими", "оих"};
         endings[1] = new String[] {"е", "еих", "еим", "", "еими", "еих"};
-        int base = gender == Gender.FEMININE ? 1 : 0;
-        if (gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            if (animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
+        int base = d.gender == Gender.FEMININE ? 1 : 0;
+        if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+            if (d.animacy == null) throw new IllegalArgumentException("Insufficient arguments");
+            if (d.animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
             return res + endings[base][Case.NOMINATIVE.ordinal()];
         }
-        return res + endings[base][gramCase.ordinal()];
+        return res + endings[base][d.gramCase.ordinal()];
     }
     /**
      * Выдаёт порядковое числительное в нужной форме.
      * @param num число
-     * @param gender род
-     * @param gramCase падеж
-     * @param count грамматическое число
+     * @param d грамматические признаки (род, падеж, грамматическое число)
      * @return число прописью
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
-    private static String getOrdinalNumeral(int num, Gender gender, Case gramCase, Count count) {
+    private static String getOrdinalNumeral(int num, Declension d) {
+        if (d.gender == null || d.gramCase == null || d.count == null)
+            throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
         return res;
     }
     /**
      * Выдаёт количественное числительное в нужной форме.
      * @param num число
-     * @param gender род
-     * @param gramCase падеж
-     * @param count грамматическое число
+     * @param d грамматические признаки (род, падеж, грамматическое число, одушевлённость)
      * @return число прописью
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
-    private static String getCardinalNumeral(int num, Gender gender, Case gramCase, Count count, Animacy animacy) {
+    private static String getCardinalNumeral(int num, Declension d) {
+        // TODO: выдавать исключения в зависимости от числа
+        if (d.gender == null || d.gramCase == null || d.count == null || d.animacy == null)
+            throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
         if (num == 1000) {
             String base = "тысяч";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"а", "и", "е", "у", "ей", "е"};
             endings[1] = new String[]{"и", "", "ам", "и", "ами", "ах"};
-            return base + endings[count.ordinal()][gramCase.ordinal()];
+            return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 10e5 || num == 10e8) {
             String base = num == 10e5 ? "миллион" : "миллиард";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
             endings[1] = new String[]{"ы", "ов", "ам", "ы", "ами", "ах"};
-            return base + endings[count.ordinal()][gramCase.ordinal()];
+            return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 1) {
             String base = "од";
@@ -246,18 +261,21 @@ public class RussianNumeral {
             endings[1] = new String[]{"на", "ной", "ной", "ну", "ной", "ной"};
             endings[2] = new String[]{"но", "ного", "ному", "но", "ним", "ном"};
             endings[3] = new String[]{"ни", "них", "ним", "", "ними", "них"};
-            int ending = count == Count.PLURAL ? 3 : gender.ordinal();
-            if (gramCase == Case.ACCUSATIVE && (gender == Gender.MASCULINE || count == Count.PLURAL)) {
-                if (animacy == Animacy.ANIMATE) return base + endings[ending][Case.GENITIVE.ordinal()];
+            int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal();
+            if (d.gramCase == Case.ACCUSATIVE && (d.gender == Gender.MASCULINE || d.count == Count.PLURAL)) {
+                if (d.animacy == Animacy.ANIMATE) return base + endings[ending][Case.GENITIVE.ordinal()];
                 return base + endings[ending][Case.NOMINATIVE.ordinal()];
             }
-            return base + endings[ending][gramCase.ordinal()];
+            return base + endings[ending][d.gramCase.ordinal()];
         }
         return res;
     }
 
     /**
-     * <p>Класс, описывающий грамматические признаки числительного.</p>
+     * <p>Класс, описывающий грамматические признаки числительного:
+     * {@link Gender грамматический род}, {@link Case падеж},
+     * {@link Count грамматическое число} (для числительных типа один, тысяча),
+     * {@link Type разряд}, {@link Animacy одушевлённость существительного, к которому относится числительное}.</p>
      * <p>Объект этого класса передаётся как аргумент в функции, выдающие числительное.</p>
      */
     public static class Declension {
