@@ -257,6 +257,146 @@ public class RussianNumeral {
     }
 
     /**
+     * <p>Класс, описывающий грамматические признаки числительного.</p>
+     * <p>Объект этого класса передаётся как аргумент в функции, выдающие числительное.</p>
+     */
+    public static class Declension {
+        private final Gender gender;
+        private final Case gramCase;
+        private final Count count;
+        private final Type type;
+        private final Animacy animacy;
+
+        /**
+         * Выдаёт грамматический род числительного.
+         * @return род
+         */
+        public Gender getGender() {
+            return gender;
+        }
+
+        /**
+         * Выдаёт падеж числительного.
+         * @return падеж
+         */
+        public Case getGramCase() {
+            return gramCase;
+        }
+
+        /**
+         * Выдаёт грамматическое число (для числительных типа один, тысяча).
+         * @return грамматическое число
+         */
+        public Count getCount() {
+            return count;
+        }
+
+        /**
+         * Выдаёт разряд числительного.
+         * @return разряд
+         */
+        public Type getType() {
+            return type;
+        }
+
+        /**
+         * Выдаёт одушевлённость существительного, к которому относится числительное.
+         * @return одушевлённость
+         */
+        public Animacy getAnimacy() {
+            return animacy;
+        }
+
+        /**
+         * Конструктор.
+         * @param gender род
+         * @param gramCase падеж
+         * @param count грамматическое число
+         * @param type разряд
+         * @param animacy одушевлённость
+         */
+        private Declension(Gender gender, Case gramCase, Count count, Type type, Animacy animacy) {
+            this.gender = gender;
+            this.gramCase = gramCase;
+            this.count = count;
+            this.type = type;
+            this.animacy = animacy;
+        }
+    }
+
+    /**
+     * Класс для указания грамматических признаков числительного.
+     * @see Declension
+     */
+    public static class DeclensionBuilder {
+        private Gender _gender = null;
+        private Case _gramCase;
+        private Count _count = null;
+        private Type _type = null;
+        private Animacy _animacy = null;
+
+        /**
+         * Конструктор. Обязательный параметр - падеж (как единственный общий признак у количественных и порядковых числительных).
+         * @param _gramCase падеж
+         */
+        public DeclensionBuilder(Case _gramCase) {
+            this._gramCase = _gramCase;
+        }
+
+        /**
+         * Получить грамматические признаки числительного.
+         * @return объект класса {@link Declension}.
+         */
+        public Declension build() {
+            return new Declension(_gender, _gramCase, _count, _type, _animacy);
+        }
+
+        /**
+         * Указать грамматический род числительного.
+         * @param _gender род
+         */
+        public DeclensionBuilder gender(Gender _gender) {
+            this._gender = _gender;
+            return this;
+        }
+
+        /**
+         * Указать падеж числительного.
+         * @param _gramCase падеж
+         */
+        public DeclensionBuilder gramCase(Case _gramCase) {
+            this._gramCase = _gramCase;
+            return this;
+        }
+
+        /**
+         * Указать грамматическое число (для числительных типа один, тысяча).
+         * @param _count грамматическое число
+         */
+        public DeclensionBuilder count(Count _count) {
+            this._count = _count;
+            return this;
+        }
+
+        /**
+         * Указать разряд числительного.
+         * @param _type разряд
+         */
+        public DeclensionBuilder type(Type _type) {
+            this._type = _type;
+            return this;
+        }
+
+        /**
+         * Указать одушевлённость существительного, к которому относится числительное.
+         * @param _animacy одушевлённость
+         */
+        public DeclensionBuilder animacy(Animacy _animacy) {
+            this._animacy = _animacy;
+            return this;
+        }
+    }
+    /**
      * <p>Дробь. Не предоставляет возможности проводить какие-либо операции, служит исключительно как "обёртка".</p>
      * <p>Поддерживаются простые (2/3, 5/2) и смешанные (1 2/3) дроби, в т.ч. и отрицательные.</p>
      */
