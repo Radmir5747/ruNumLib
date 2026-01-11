@@ -312,6 +312,20 @@ public class RussianNumeral {
             int ending = (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) ? 0 : 1;
             return numerals[numeral] + endings[base][ending];
         }
+        if (num == 200 || num == 300 || num == 400 || num == 500 || num == 600 || num == 700 || num == 800 || num == 900) {
+            Declension first_d = new DeclensionBuilder(d.gramCase)
+                    .animacy(Animacy.INANIMATE).gender(Gender.FEMININE).build();
+            String[] endings = new String[] {"", "сот", "стам", "", "стами", "стах"};
+            String[] nominativeEndings = new String[] {"сти", "ста", "сот"};
+            res = getCardinalNumeral(num / 100, first_d);
+            if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+                int i = 2;
+                if (num == 200) i = 0;
+                else if (num == 300 || num == 400) i = 1;
+                return res + nominativeEndings[i];
+            }
+            return res + endings[d.gramCase.ordinal()];
+        }
         return res;
     }
 
