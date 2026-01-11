@@ -285,6 +285,33 @@ public class RussianNumeral {
             }
             return numerals[num - 2] + endings[ending][d.gramCase.ordinal()];
         }
+        if ((num > 4 && num < 21) || (num == 30)) { // 5 - 20, 30
+            String[] eightCases = new String[] {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
+            // у числительного восемь учитываем беглую гласную
+            if (num == 8) return eightCases[d.gramCase.ordinal()];
+            String[] numerals = new String[] {"пят", "шест", "сем", "", "девят", "десят", "одиннадцат",
+                    "двенадцат", "тринадцат", "четырнадцат", "пятнадцат", "шестнадцат", "семнадцат",
+                    "восемнадцат", "девятнадцат", "двадцат", "тридцат"};
+            String[] endings = {"ь", "и", "и", "ь", "ью", "и"};
+            int base = num == 30 ? 16 : num - 5;
+            return numerals[base] + endings[d.gramCase.ordinal()];
+        }
+        if (num == 50 || num == 60 || num == 70 || num == 80) {
+            String[] endings = new String[] {"", "и", "и", "", "ью", "и"};
+            return getCardinalNumeral(num / 10, d) + "десят" + endings[d.gramCase.ordinal()];
+        }
+        if (num == 40 || num == 90 || num == 100) {
+            String[] numerals = new String[] {"сорок", "девяност", "ст"};
+            String[][] endings = new String[2][6];
+            endings[0] = new String[] {"", "а"};
+            endings[1] = new String[] {"о", "а"};
+            int numeral = 0;
+            if (num == 90) numeral = 1;
+            else if (num == 100) numeral = 2;
+            int base = num == 40 ? 0 : 1;
+            int ending = (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) ? 0 : 1;
+            return numerals[numeral] + endings[base][ending];
+        }
         return res;
     }
 
