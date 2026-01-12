@@ -215,6 +215,35 @@ public class RussianNumeral {
         }
         return res + endings[base][d.gramCase.ordinal()];
     }
+
+    /**
+     * <p>Выдаёт необходимую форму числительного <i>полтора</i> в зависимости от грамматического рода и падежа.</p>
+     * <p>Необходимо передать падеж и род, иначе выдаёт исключение.</p>
+     * @param d грамматические характеристики числительного (род, падеж)
+     * @return числительное <i>полтора</i> в нужной форме
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
+     */
+    public static String getOneAndAHalf(Declension d) {
+        String[] numerals = new String[] {"полтора", "полторы", "полутора"};
+        if (d.gramCase == null || d.gender == null)
+            throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+            if (d.gender == Gender.FEMININE) return numerals[1];
+            return numerals[0];
+        }
+        return numerals[2];
+    }
+
+    /**
+     * <p>Выдаёт необходимую форму числительного <i>полтораста</i> в зависимости от падежа.</p>
+     * <p>Необходимо передать падеж, иначе выдаёт исключение.</p>
+     * @param d грамматические характеристики числительного (падеж)
+     * @return числительное <i>полтораста</i> в нужной форме
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
+     */
+    public static String get150(Declension d) {
+        return getOneAndAHalf(new DeclensionBuilder(d.gramCase).gender(Gender.MASCULINE).build()) + "ста";
+    }
     /**
      * Выдаёт порядковое числительное в нужной форме.
      * @param num число
