@@ -124,7 +124,7 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     public static String getNumeral(int num, Declension d) {
-        if (d.type == null) throw new IllegalArgumentException("Insufficient arguments");
+        if (d.type == null) throw new IllegalArgumentException("Missing type of numeral");
         if (d.type == Type.CARDINAL) return getCardinalNumeral(num, d);
         return getOrdinalNumeral(num, d);
     }
@@ -173,7 +173,7 @@ public class RussianNumeral {
      * необходимые грамматические характеристики.
      */
     public static String getCollectiveNumeral(int num, Declension d) {
-        if (d.gramCase == null || d.animacy == null) throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
         String res = "";
         String[][] endings = new String[2][6];
@@ -183,10 +183,7 @@ public class RussianNumeral {
         res = numerals[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            // одушевлённое - окончание как у родительного падежа
-            // неодушевлённое - как у именительного падежа
-            if (d.animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
-            return res + endings[base][Case.NOMINATIVE.ordinal()];
+            return modifyForAnimacy(res, endings[base], d);
         }
         return res + endings[base][d.gramCase.ordinal()];
     }
@@ -202,16 +199,14 @@ public class RussianNumeral {
      */
     public static String getBoth(Declension d) {
         if (d.gender == null || d.gramCase == null)
-            throw new IllegalArgumentException("Insufficient arguments");
+            throw new IllegalArgumentException("Missing gender and/or grammatical case");
         String res = "об";
         String[][] endings = new String[2][6];
         endings[0] = new String[] {"а", "оих", "оим", "", "оими", "оих"};
         endings[1] = new String[] {"е", "еих", "еим", "", "еими", "еих"};
         int base = d.gender == Gender.FEMININE ? 1 : 0;
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            if (d.animacy == null) throw new IllegalArgumentException("Insufficient arguments");
-            if (d.animacy == Animacy.ANIMATE) return res + endings[base][Case.GENITIVE.ordinal()];
-            return res + endings[base][Case.NOMINATIVE.ordinal()];
+            return modifyForAnimacy(res, endings[base], d);
         }
         return res + endings[base][d.gramCase.ordinal()];
     }
@@ -226,7 +221,7 @@ public class RussianNumeral {
     public static String getOneAndAHalf(Declension d) {
         String[] numerals = new String[] {"полтора", "полторы", "полутора"};
         if (d.gramCase == null || d.gender == null)
-            throw new IllegalArgumentException("Insufficient arguments");
+            throw new IllegalArgumentException("Missing gender and/or grammatical case");
         if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
             if (d.gender == Gender.FEMININE) return numerals[1];
             return numerals[0];
@@ -265,12 +260,10 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     private static String getCardinalNumeral(int num, Declension d) {
-        // TODO: выдавать исключения в зависимости от числа
-        if (d.gramCase == null || d.animacy == null)
-            throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         if (num == 1000) {
-            if (d.count == null) throw new IllegalArgumentException("Insufficient arguments");
+            if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
             String base = "тысяч";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"а", "и", "е", "у", "ей", "е"};
@@ -278,7 +271,7 @@ public class RussianNumeral {
             return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 10e5 || num == 10e8) {
-            if (d.count == null) throw new IllegalArgumentException("Insufficient arguments");
+            if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
             String base = num == 10e5 ? "миллион" : "миллиард";
             String[][] endings = new String[2][6];
             endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
@@ -286,7 +279,8 @@ public class RussianNumeral {
             return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 1) {
-            if (d.count == null || d.gender == null) throw new IllegalArgumentException("Insufficient arguments");
+            if (d.count == null || d.gender == null) throw new IllegalArgumentException("Missing grammatical count " +
+                    "and/or gender");
             String base = "од";
             String[][] endings = new String[4][6];
             endings[0] = new String[]{"ин", "ного", "ному", "", "ним", "ном"};
@@ -300,7 +294,7 @@ public class RussianNumeral {
             return base + endings[ending][d.gramCase.ordinal()];
         }
         if (num > 1 && num < 5) { // 2, 3, 4
-            if (num == 2 && d.gender == null) throw new IllegalArgumentException("Insufficient arguments");
+            if (num == 2 && d.gender == null) throw new IllegalArgumentException("Missing gender");
             String[] numerals = new String[]{"дв", "тр", "четыр"};
             String[][] endings = new String[4][6];
             endings[0] = new String[]{"а", "ух", "ум", "", "умя", "ух"};
@@ -373,6 +367,9 @@ public class RussianNumeral {
      * @return число прописью
      */
     private static String modifyForAnimacy(String base, String[] endings, Declension d) {
+        if (d.animacy == null) throw new IllegalArgumentException("Missing animacy");
+        // одушевлённое - окончание как у родительного падежа
+        // неодушевлённое - как у именительного падежа
         if (d.animacy == Animacy.ANIMATE) return base + endings[Case.GENITIVE.ordinal()];
         return base + endings[Case.NOMINATIVE.ordinal()];
     }
