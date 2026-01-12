@@ -355,6 +355,12 @@ public class RussianNumeral {
             }
             return res + endings[d.gramCase.ordinal()];
         }
+        if (num > 20 && num < 100) { // составные числительные для двузначных чисел
+            return getCardinalNumeral(num / 10 * 10, d) + " " + getCardinalNumeral(num % 10, d);
+        }
+        if (num > 100 && num < 1000) { // составные числительные для трёхзначных чисел
+            return getCardinalNumeral(num / 100 * 100, d) + " " + getCardinalNumeral(num % 100, d);
+        }
         return res;
     }
 
