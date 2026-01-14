@@ -125,8 +125,13 @@ public class RussianNumeral {
      */
     public static String getNumeral(int num, Declension d) {
         if (d.type == null) throw new IllegalArgumentException("Missing type of numeral");
-        if (d.type == Type.CARDINAL) return getCardinalNumeral(num, d);
-        return getOrdinalNumeral(num, d);
+        boolean negative = false;
+        if (num < 0) {
+            negative = true;
+            num *= -1;
+        }
+        if (d.type == Type.CARDINAL) return (negative ? "минус " : "") + getCardinalNumeral(num, d);
+        return (negative ? "минус " : "") + getOrdinalNumeral(num, d);
     }
 
     /* дробные числительные бывают только количественными */
