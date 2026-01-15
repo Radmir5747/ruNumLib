@@ -448,6 +448,14 @@ public class RussianNumeral {
             this.type = type;
             this.animacy = animacy;
         }
+
+        /**
+         * <p>Вспомогательная функция для сокращения условий.</p>
+         * @return true, если падеж именительный или винительный
+         */
+        private boolean isNomAcc() {
+            return gramCase == Case.NOMINATIVE || gramCase == Case.ACCUSATIVE;
+        }
     }
 
     /**
