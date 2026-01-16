@@ -180,7 +180,7 @@ public class RussianNumeral {
     public static String getCollectiveNumeral(int num, Declension d) {
         if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
-        String res = "";
+        String res;
         String[][] endings = new String[2][6];
         endings[0] = new String[]{"е", "их", "им", "", "ими", "их"}; // мягкая основа
         endings[1] = new String[]{"о", "ых", "ым", "", "ыми", "ых"}; // твёрдая основа
@@ -203,8 +203,8 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     public static String getBoth(Declension d) {
-        if (d.gender == null || d.gramCase == null)
-            throw new IllegalArgumentException("Missing gender and/or grammatical case");
+        if (d.gender == null) throw new IllegalArgumentException("Missing gender");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "об";
         String[][] endings = new String[2][6];
         endings[0] = new String[] {"а", "оих", "оим", "", "оими", "оих"};
@@ -225,9 +225,9 @@ public class RussianNumeral {
      */
     public static String getOneAndAHalf(Declension d) {
         String[] numerals = new String[] {"полтора", "полторы", "полутора"};
-        if (d.gramCase == null || d.gender == null)
-            throw new IllegalArgumentException("Missing gender and/or grammatical case");
-        if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+        if (d.gender == null) throw new IllegalArgumentException("Missing gender");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
+        if (d.isNomAcc()) {
             if (d.gender == Gender.FEMININE) return numerals[1];
             return numerals[0];
         }
@@ -287,8 +287,8 @@ public class RussianNumeral {
             return "нол" + new String[]{"ь", "я", "ю", "ь", "ём", "е"}[d.gramCase.ordinal()];
         }
         if (num == 1) {
-            if (d.count == null || d.gender == null) throw new IllegalArgumentException("Missing grammatical count " +
-                    "and/or gender");
+            if (d.gender == null) throw new IllegalArgumentException("Missing gender");
+            if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
             String base = "од";
             String[][] endings = new String[4][6];
             endings[0] = new String[]{"ин", "ного", "ному", "", "ним", "ном"};
@@ -340,7 +340,7 @@ public class RussianNumeral {
             if (num == 90) numeral = 1;
             else if (num == 100) numeral = 2;
             int base = num == 40 ? 0 : 1;
-            int ending = (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) ? 0 : 1;
+            int ending = d.isNomAcc() ? 0 : 1;
             return numerals[numeral] + endings[base][ending];
         }
         if (num == 200 || num == 300 || num == 400 || num == 500 || num == 600 || num == 700 || num == 800 || num == 900) {
@@ -349,7 +349,7 @@ public class RussianNumeral {
             String[] endings = new String[] {"", "сот", "стам", "", "стами", "стах"};
             String[] nominativeEndings = new String[] {"сти", "ста", "сот"};
             res = getCardinalNumeral(num / 100, first_d);
-            if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+            if (d.isNomAcc()) {
                 int i = 2;
                 if (num == 200) i = 0;
                 else if (num == 300 || num == 400) i = 1;
@@ -432,7 +432,7 @@ public class RussianNumeral {
             out.count(Count.PLURAL);
             // для числительных миллион, миллиард и т.п. именительный и винительный падеж принимают форму
             // родительного падежа единственного числа: два миллиона (не *два миллионы)
-            if ((d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) && !isThousand) {
+            if (d.isNomAcc() && !isThousand) {
                 out.count(Count.SINGULAR);
                 out.gramCase(Case.GENITIVE);
             }
@@ -441,7 +441,7 @@ public class RussianNumeral {
             out.count(Count.PLURAL);
             // именительный и винительный падеж принимают форму родительного падежа множественного числа:
             // пять тысяч, миллионов (не *пять тысячи, *пять миллионы)
-            if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+            if (d.isNomAcc()) {
                 out.gramCase(Case.GENITIVE);
             }
         }
