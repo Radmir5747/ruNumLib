@@ -283,6 +283,9 @@ public class RussianNumeral {
             endings[1] = new String[]{"ы", "ов", "ам", "ы", "ами", "ах"};
             return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
         }
+        if (num == 0) { // ноль - не числительное, но в его образовании участвует
+            return "нол" + new String[]{"ь", "я", "ю", "ь", "ём", "е"}[d.gramCase.ordinal()];
+        }
         if (num == 1) {
             if (d.count == null || d.gender == null) throw new IllegalArgumentException("Missing grammatical count " +
                     "and/or gender");
@@ -355,7 +358,7 @@ public class RussianNumeral {
             return res + endings[d.gramCase.ordinal()];
         }
         if (num > 20 && num < 100) { // составные числительные для двузначных чисел
-            // снимаем одушевлённость с числительных один-четыре
+            // снимаем одушевлённость с числительных один-четыре TODO: не один, а два
             // составное количественное числительное управляет существительным: люблю двести семьдесят три ученика
             // https://gramota.ru/spravka/vopros/322608
             return getCardinalNumeral(num / 10 * 10, d) + " " + getCardinalNumeral(num % 10,
@@ -363,6 +366,28 @@ public class RussianNumeral {
         }
         if (num > 100 && num < 1000) { // составные числительные для трёхзначных чисел
             return getCardinalNumeral(num / 100 * 100, d) + " " + getCardinalNumeral(num % 100, d);
+        }
+        // разбиваем числа больше 999 на разряды
+        int baseCount = (int)Math.log10(num) / 3; // количество разрядов
+        Integer[] nums = new Integer[baseCount + 1];
+        for (int i = 0; i <= baseCount; i++) { // разделяем число на разряды, начиная с последнего (самый высокий будет в конце)
+            nums[i] = num % 1000;
+            num /= 1000;
+        }
+        // идём с конца
+        for (int i = baseCount; i >= 0; i--) {
+            if (nums[i] == 0) continue; // разряды с нулём не отражаются на письме (*ноль тысяч девятнадцать)
+            DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
+            if (i != 0) { // последний разряд согласуется с существительным
+                baseDeclension.animacy(Animacy.INANIMATE); // снимаем одушевлённость (убить *трёх тысячи)
+                if (i == 1) baseDeclension.gender(Gender.FEMININE); // слово тысяча женского рода
+                else baseDeclension.gender(Gender.MASCULINE);
+            }
+            res += getCardinalNumeral(nums[i], baseDeclension.build()); // склоняем три цифры
+            if (i == 0) continue; // единицы-десятки-сотни не имеют слова, отражающего разряд
+            // склоняем разряд
+            res += " " + getCardinalNumeral((int)Math.pow(1000, i), supplementalDeclension(nums[i], i == 1,
+                            new DeclensionBuilder(d).build())) + " ";
         }
         return res;
     }
@@ -381,6 +406,46 @@ public class RussianNumeral {
         // неодушевлённое - как у именительного падежа
         if (d.animacy == Animacy.ANIMATE) return base + endings[Case.GENITIVE.ordinal()];
         return base + endings[Case.NOMINATIVE.ordinal()];
+    }
+
+    /**
+     * <p>Вспомогательная функция, выдаёт набор грамматических характеристик для согласования разрядов в
+     * числительных типа одна тысяча, пять миллионов и проч.</p>
+     * @param num число, отражающее три цифры перед разрядом
+     * @param d грамматические характеристики исходного числа
+     * @param isThousand является ли разряд тысячей
+     * @return грамматические характеристики разряда
+     */
+    private static Declension supplementalDeclension(int num, boolean isThousand, Declension d) {
+        num %= 100; // приводим число к двузначному
+        DeclensionBuilder out = new DeclensionBuilder(d.gramCase).type(Type.CARDINAL);
+        if (num == 0) {
+            // ноль управляет словами, ставя их в форму родительного падежа множественного числа:
+            // ноль тысяч, нуля тысяч, нулю тысяч, нулём тысяч, о нуле тысяч
+            out.count(Count.PLURAL).gramCase(Case.GENITIVE);
+        } else if (num % 10 == 1 && num != 11) {
+            // если число оканчивается на 1, то оно ставит слово в форму единственного числа
+            out.count(Count.SINGULAR);
+        } else if ((num % 10 == 2 && num != 12) || (num % 10 == 3 && num != 13) || (num % 10 == 4 && num != 14)) {
+            // числа, оканчивающиеся на 2, 3, 4 кроме чисел 12, 13, 14
+            // ставим слово в форму множественного числа
+            out.count(Count.PLURAL);
+            // для числительных миллион, миллиард и т.п. именительный и винительный падеж принимают форму
+            // родительного падежа единственного числа: два миллиона (не *два миллионы)
+            if ((d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) && !isThousand) {
+                out.count(Count.SINGULAR);
+                out.gramCase(Case.GENITIVE);
+            }
+        }
+        else {
+            out.count(Count.PLURAL);
+            // именительный и винительный падеж принимают форму родительного падежа множественного числа:
+            // пять тысяч, миллионов (не *пять тысячи, *пять миллионы)
+            if (d.gramCase == Case.NOMINATIVE || d.gramCase == Case.ACCUSATIVE) {
+                out.gramCase(Case.GENITIVE);
+            }
+        }
+        return out.build();
     }
 
     /**
