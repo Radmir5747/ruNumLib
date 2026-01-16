@@ -478,6 +478,18 @@ public class RussianNumeral {
         }
 
         /**
+         * Конструктор копирования, принимает аргументом объект класса {@link Declension}.
+         * @param d грамматические характеристики
+         */
+        public DeclensionBuilder(Declension d) {
+            this._gender = d.gender;
+            this._gramCase = d.gramCase;
+            this._count = d.count;
+            this._type = d.type;
+            this._animacy = d.animacy;
+        }
+
+        /**
          * Получить грамматические признаки числительного.
          * @return объект класса {@link Declension}.
          */
