@@ -358,11 +358,12 @@ public class RussianNumeral {
             return res + endings[d.gramCase.ordinal()];
         }
         if (num > 20 && num < 100) { // составные числительные для двузначных чисел
-            // снимаем одушевлённость с числительных один-четыре TODO: не один, а два
+            // снимаем одушевлённость с числительных два-четыре
             // составное количественное числительное управляет существительным: люблю двести семьдесят три ученика
+            // НО люблю двести семьдесят одного ученика
             // https://gramota.ru/spravka/vopros/322608
-            return getCardinalNumeral(num / 10 * 10, d) + " " + getCardinalNumeral(num % 10,
-                    new DeclensionBuilder(d).animacy(Animacy.INANIMATE).build());
+            Declension newDeclension = num % 10 == 1 ? d : new DeclensionBuilder(d).animacy(Animacy.INANIMATE).build();
+            return getCardinalNumeral(num / 10 * 10, d) + " " + getCardinalNumeral(num % 10, newDeclension);
         }
         if (num > 100 && num < 1000) { // составные числительные для трёхзначных чисел
             return getCardinalNumeral(num / 100 * 100, d) + " " + getCardinalNumeral(num % 100, d);
