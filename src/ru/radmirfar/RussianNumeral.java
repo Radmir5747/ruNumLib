@@ -115,7 +115,145 @@ public class RussianNumeral {
          */
         INANIMATE
     }
-
+    //<editor-fold desc="Константы - окончания и основы">
+    /**
+     * <p>Окончания порядковых числительных с твёрдой основой. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - мужского рода</li>
+     * <li>1 - женского рода</li>
+     * <li>2 - среднего рода</li>
+     * <li>3 - множественного числа</li>
+     * </ul>
+     */
+    private static final String[][] HARD_ORD_ENDINGS = {
+            {"ый", "ого", "ому", "", "ым", "ом"}, /*2, 6, 8, 40 - именительный падеж - ой!*/
+            {"ая", "ой", "ой", "ую", "ой", "ой"},
+            {"ое", "ого", "ому", "ое", "ым", "ом"},
+            {"ые", "ых", "ым", "", "ыми", "ых"}};
+    /**
+     * <p>Окончания порядковых числительных с мягкой основой. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - мужского рода</li>
+     * <li>1 - женского рода</li>
+     * <li>2 - среднего рода</li>
+     * <li>3 - множественного числа</li>
+     * </ul>
+     */
+    private static final String[][] SOFT_ORD_ENDINGS = {
+            {"ий", "ьего", "ьему", "", "ьим", "ьем"},
+            {"ья", "ьей", "ьей", "ью", "ьей", "ьей"},
+            {"ье", "ьего", "ьему", "ье", "ьим", "ьем"},
+            {"ьи", "ьих", "ьим", "", "ьими", "ьих"}};
+    /**
+     * <p>Окончания собирательных числительных. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - числительных с мягкой основой (двое, трое)</li>
+     * <li>1 - числительных с твёрдой основой (все остальные)</li>
+     * </ul>
+     */
+    private static final String[][] COLLECTIVE_NUM_ENDINGS = {
+            {"е", "их", "им", "", "ими", "их"}, // мягкая основа
+            {"о", "ых", "ым", "", "ыми", "ых"}  // твёрдая основа
+    };
+    /**
+     * Основы собирательных числительных.
+     */
+    private static final String[] COLLECTIVE_NUMERAL_BASES = {"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
+    /**
+     * <p>Окончания числительных <i>оба / обе</i>. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - числительного оба</li>
+     * <li>1 - числительного обе</li>
+     * </ul>
+     */
+    private static final String[][] BOTH_ENDINGS = {
+            {"а", "оих", "оим", "", "оими", "оих"},
+            {"е", "еих", "еим", "", "еими", "еих"}
+    };
+    /**
+     * <p>Окончания числительного <i>тысяча</i>. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - единственного числа</li>
+     * <li>1 - множественного числа</li>
+     * </ul>
+     */
+    private static final String[][] THOUSAND_CARD_ENDINGS = new String[][]{
+            {"а", "и", "е", "у", "ей", "е"},
+            {"и", "", "ам", "и", "ами", "ах"}
+    };
+    /**
+     * <p>Окончания числительных <i>миллион</i>, <i>миллиард</i> и т. д. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - единственного числа</li>
+     * <li>1 - множественного числа</li>
+     * </ul>
+     */
+    private static final String[][] MILLION_CARD_ENDINGS = {
+            {"", "а", "у", "", "ом", "е"},
+            {"ы", "ов", "ам", "ы", "ами", "ах"}
+    };
+    /**
+     * <p>Окончания числительного <i>один</i>. Индексы массива обозначают окончания:</p>
+     * <ul>
+     * <li>0 - мужского рода</li>
+     * <li>1 - женского рода</li>
+     * <li>2 - среднего рода</li>
+     * <li>3 - множественного числа</li>
+     * </ul>
+     */
+    private static final String[][] ONE_CARD_ENDINGS = {
+            {"ин", "ного", "ному", "", "ним", "ном"},
+            {"на", "ной", "ной", "ну", "ной", "ной"},
+            {"но", "ного", "ному", "но", "ним", "ном"},
+            {"ни", "них", "ним", "", "ними", "них"}
+    };
+    /**
+     * <p>Окончания числительных <i>два / две</i>, <i>три</i>, <i>четыре</i>.
+     * Индексы массива обозначают окончания числительных:</p>
+     * <ul>
+     * <li>0 - два</li>
+     * <li>1 - две</li>
+     * <li>2 - три</li>
+     * <li>3 - четыре</li>
+     * </ul>
+     */
+    private static final String[][] TWO_FOUR_CARD_ENDINGS = {
+            {"а", "ух", "ум", "", "умя", "ух"},
+            {"е", "ух", "ум", "", "умя", "ух"},
+            {"и", "ёх", "ём", "", "емя", "ёх"},
+            {"е", "ёх", "ём", "", "ьмя", "ёх"}
+    };
+    /**
+     * Основы числительных <i>два / две</i>, <i>три</i>, <i>четыре</i>.
+     */
+    private static final String[] TWO_FOUR_CARD_BASES = new String[]{"дв", "тр", "четыр"};
+    /**
+     * Склонение числительного <i>восемь</i>.
+     */
+    private static final String[] EIGHT_CARD_CASES = {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
+    /**
+     * Основы числительных <i>пять-двадцать</i>, <i>тридцать</i>.
+     */
+    private static final String[] FIVE_TWENTY_CARD_BASES = {"пят", "шест", "сем", "", "девят", "десят", "одиннадцат",
+            "двенадцат", "тринадцат", "четырнадцат", "пятнадцат", "шестнадцат", "семнадцат",
+            "восемнадцат", "девятнадцат", "двадцат", "тридцат"};
+    /**
+     * Окончания числительных <i>пять-двадцать</i>, <i>тридцать</i>.
+     */
+    private static final String[] FIVE_TWENTY_CARD_ENDINGS = {"ь", "и", "и", "ь", "ью", "и"};
+    /**
+     * Основы числительных <i>сорок</i>, <i>девяносто</i>, <i>сто</i>.
+     */
+    private static final String[] FORTY_NINETY_CARD_BASES = {"сорок", "девяност", "ст"};
+    /**
+     * Окончания косвенных падежей сложных числительных, оканчивающихся на <i>сто / ста / сти</i>
+     */
+    private static final String[] HUNDRED_CARD_ENDINGS = {"", "сот", "стам", "", "стами", "стах"};
+    /**
+     * Окончания именительного падежа падежей сложных числительных, оканчивающихся на <i>сто / ста / сти</i>
+     */
+    private static final String[] HUNDRED_CARD_NOM_ENDINGS = {"сти", "ста", "сот"};
+    //</editor-fold>
     /**
      * Выдаёт число прописью.
      * @param num число
@@ -180,17 +318,12 @@ public class RussianNumeral {
     public static String getCollectiveNumeral(int num, Declension d) {
         if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
-        String res;
-        String[][] endings = new String[2][6];
-        endings[0] = new String[]{"е", "их", "им", "", "ими", "их"}; // мягкая основа
-        endings[1] = new String[]{"о", "ых", "ым", "", "ыми", "ых"}; // твёрдая основа
-        String[] numerals = new String[]{"дво", "тро", "четвер", "пятер", "шестер", "семер", "восьмер", "девятер", "десятер"};
-        res = numerals[num - 2];
+        String res = COLLECTIVE_NUMERAL_BASES[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            return modifyForAnimacy(res, endings[base], d);
+            return modifyForAnimacy(res, COLLECTIVE_NUM_ENDINGS[base], d);
         }
-        return res + endings[base][d.gramCase.ordinal()];
+        return res + COLLECTIVE_NUM_ENDINGS[base][d.gramCase.ordinal()];
     }
 
     /**
@@ -205,15 +338,11 @@ public class RussianNumeral {
     public static String getBoth(Declension d) {
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
         if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
-        String res = "об";
-        String[][] endings = new String[2][6];
-        endings[0] = new String[] {"а", "оих", "оим", "", "оими", "оих"};
-        endings[1] = new String[] {"е", "еих", "еим", "", "еими", "еих"};
-        int base = d.gender == Gender.FEMININE ? 1 : 0;
+        int base = d.gender == Gender.FEMININE ? 1 : 0; // в зависимости от рода используем набор окончаний
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            return modifyForAnimacy(res, endings[base], d);
+            return modifyForAnimacy("об", BOTH_ENDINGS[base], d);
         }
-        return res + endings[base][d.gramCase.ordinal()];
+        return "об" + BOTH_ENDINGS[base][d.gramCase.ordinal()];
     }
 
     /**
@@ -224,14 +353,13 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     public static String getOneAndAHalf(Declension d) {
-        String[] numerals = new String[] {"полтора", "полторы", "полутора"};
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
         if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
-        if (d.isNomAcc()) {
-            if (d.gender == Gender.FEMININE) return numerals[1];
-            return numerals[0];
+        if (d.isNomAcc()) { // в именительном и винительном падеже
+            if (d.gender == Gender.FEMININE) return "полторы"; // у женского рода полторы
+            return "полтора"; // у мужского и среднего рода полтора
         }
-        return numerals[2];
+        return "полутора"; // в остальных падежах полутора
     }
 
     /**
@@ -269,19 +397,12 @@ public class RussianNumeral {
         String res = "";
         if (num == 1000) {
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
-            String base = "тысяч";
-            String[][] endings = new String[2][6];
-            endings[0] = new String[]{"а", "и", "е", "у", "ей", "е"};
-            endings[1] = new String[]{"и", "", "ам", "и", "ами", "ах"};
-            return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
+            return "тысяч" + THOUSAND_CARD_ENDINGS[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 10e5 || num == 10e8) {
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
-            String base = num == 10e5 ? "миллион" : "миллиард";
-            String[][] endings = new String[2][6];
-            endings[0] = new String[]{"", "а", "у", "", "ом", "е"};
-            endings[1] = new String[]{"ы", "ов", "ам", "ы", "ами", "ах"};
-            return base + endings[d.count.ordinal()][d.gramCase.ordinal()];
+            res = num == 10e5 ? "миллион" : "миллиард";
+            return res + MILLION_CARD_ENDINGS[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 0) { // ноль - не числительное, но в его образовании участвует
             return "нол" + new String[]{"ь", "я", "ю", "ь", "ём", "е"}[d.gramCase.ordinal()];
@@ -289,73 +410,50 @@ public class RussianNumeral {
         if (num == 1) {
             if (d.gender == null) throw new IllegalArgumentException("Missing gender");
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
-            String base = "од";
-            String[][] endings = new String[4][6];
-            endings[0] = new String[]{"ин", "ного", "ному", "", "ним", "ном"};
-            endings[1] = new String[]{"на", "ной", "ной", "ну", "ной", "ной"};
-            endings[2] = new String[]{"но", "ного", "ному", "но", "ним", "ном"};
-            endings[3] = new String[]{"ни", "них", "ним", "", "ними", "них"};
-            int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal();
+            res = "од";
+            int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
+            // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
             if (d.gramCase == Case.ACCUSATIVE && (d.gender == Gender.MASCULINE || d.count == Count.PLURAL)) {
-                return modifyForAnimacy(base, endings[ending], d);
+                return modifyForAnimacy(res, ONE_CARD_ENDINGS[ending], d);
             }
-            return base + endings[ending][d.gramCase.ordinal()];
+            return res + ONE_CARD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         if (num > 1 && num < 5) { // 2, 3, 4
             if (num == 2 && d.gender == null) throw new IllegalArgumentException("Missing gender");
-            String[] numerals = new String[]{"дв", "тр", "четыр"};
-            String[][] endings = new String[4][6];
-            endings[0] = new String[]{"а", "ух", "ум", "", "умя", "ух"};
-            endings[1] = new String[]{"е", "ух", "ум", "", "умя", "ух"};
-            endings[2] = new String[]{"и", "ёх", "ём", "", "емя", "ёх"};
-            endings[3] = new String[]{"е", "ёх", "ём", "", "ьмя", "ёх"};
             int ending = num - 1;
             if (num == 2) ending = d.gender == Gender.FEMININE ? 1 : 0; // учитываем род для числ. 2
-            if (d.gramCase == Case.ACCUSATIVE) {
-                return modifyForAnimacy(numerals[num - 2], endings[ending], d);
+            if (d.gramCase == Case.ACCUSATIVE) { // у винительного падежа учитываем одушевлённость
+                return modifyForAnimacy(TWO_FOUR_CARD_BASES[num - 2], TWO_FOUR_CARD_ENDINGS[ending], d);
             }
-            return numerals[num - 2] + endings[ending][d.gramCase.ordinal()];
+            return TWO_FOUR_CARD_BASES[num - 2] + TWO_FOUR_CARD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         if ((num > 4 && num < 21) || (num == 30)) { // 5 - 20, 30
-            String[] eightCases = new String[] {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
-            // у числительного восемь учитываем беглую гласную
-            if (num == 8) return eightCases[d.gramCase.ordinal()];
-            String[] numerals = new String[] {"пят", "шест", "сем", "", "девят", "десят", "одиннадцат",
-                    "двенадцат", "тринадцат", "четырнадцат", "пятнадцат", "шестнадцат", "семнадцат",
-                    "восемнадцат", "девятнадцат", "двадцат", "тридцат"};
-            String[] endings = {"ь", "и", "и", "ь", "ью", "и"};
+            if (num == 8) return EIGHT_CARD_CASES[d.gramCase.ordinal()]; // у числительного восемь учитываем беглую гласную
             int base = num == 30 ? 16 : num - 5;
-            return numerals[base] + endings[d.gramCase.ordinal()];
+            return FIVE_TWENTY_CARD_BASES[base] + FIVE_TWENTY_CARD_ENDINGS[d.gramCase.ordinal()];
         }
         if (num == 50 || num == 60 || num == 70 || num == 80) {
-            String[] endings = new String[] {"", "и", "и", "", "ью", "и"};
-            return getCardinalNumeral(num / 10, d) + "десят" + endings[d.gramCase.ordinal()];
+            return getCardinalNumeral(num / 10, d) + "десят" + // в именительном и винительном падеже нулевое ок.
+                    (d.isNomAcc() ? "" : FIVE_TWENTY_CARD_ENDINGS[d.gramCase.ordinal()]); // иначе - ок. числ. десять
         }
         if (num == 40 || num == 90 || num == 100) {
-            String[] numerals = new String[] {"сорок", "девяност", "ст"};
-            String[][] endings = new String[2][6];
-            endings[0] = new String[] {"", "а"};
-            endings[1] = new String[] {"о", "а"};
-            int numeral = 0;
-            if (num == 90) numeral = 1;
-            else if (num == 100) numeral = 2;
-            int base = num == 40 ? 0 : 1;
-            int ending = d.isNomAcc() ? 0 : 1;
-            return numerals[numeral] + endings[base][ending];
+            if (d.isNomAcc()) { // в именительном и винительном падеже
+                if (num == 40) return FORTY_NINETY_CARD_BASES[0]; // сорок
+                return FORTY_NINETY_CARD_BASES[num == 90 ? 1 : 2] + "о"; // девяносто, сто
+            }
+            return FORTY_NINETY_CARD_BASES[num == 40 ? 0 : (num == 90 ? 1 : 2)] + "а"; // в остальных падежах ок. а
         }
         if (num == 200 || num == 300 || num == 400 || num == 500 || num == 600 || num == 700 || num == 800 || num == 900) {
             Declension first_d = new DeclensionBuilder(d.gramCase)
-                    .animacy(Animacy.INANIMATE).gender(Gender.FEMININE).build();
-            String[] endings = new String[] {"", "сот", "стам", "", "стами", "стах"};
-            String[] nominativeEndings = new String[] {"сти", "ста", "сот"};
+                    .animacy(Animacy.INANIMATE).gender(Gender.FEMININE).build(); // правильная форма для двести
             res = getCardinalNumeral(num / 100, first_d);
-            if (d.isNomAcc()) {
-                int i = 2;
-                if (num == 200) i = 0;
-                else if (num == 300 || num == 400) i = 1;
-                return res + nominativeEndings[i];
+            if (d.isNomAcc()) { // окончания для именительного / винительного падежа
+                int i = 2; // окончание сот для чисел 500-900
+                if (num == 200) i = 0; // окончание сти
+                else if (num == 300 || num == 400) i = 1; // окончание ста
+                return res + HUNDRED_CARD_NOM_ENDINGS[i];
             }
-            return res + endings[d.gramCase.ordinal()];
+            return res + HUNDRED_CARD_ENDINGS[d.gramCase.ordinal()]; // окончания косвенных падежей одинаковые
         }
         if (num > 20 && num < 100) { // составные числительные для двузначных чисел
             // снимаем одушевлённость с числительных два-четыре
