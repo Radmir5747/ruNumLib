@@ -624,6 +624,15 @@ public class RussianNumeral {
         private boolean isNomAcc() {
             return gramCase == Case.NOMINATIVE || gramCase == Case.ACCUSATIVE;
         }
+
+        /**
+         * <p>Вспомогательная функция для сокращения условий
+         * (для учёта одушевлённости в числительных, подобных прилагательным).</p>
+         * @return true, если падеж винительный, а также мужской род или множественное число.
+         */
+        private boolean adjCheck() {
+            return gramCase == Case.ACCUSATIVE && (gender == Gender.MASCULINE || count == Count.PLURAL);
+        }
     }
 
     /**
