@@ -234,9 +234,9 @@ public class RussianNumeral {
      */
     private static final String[] EIGHT_CARD_CASES = {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
     /**
-     * Основы числительных <i>пять-двадцать</i>, <i>тридцать</i>.
+     * Основы числительных <i>пять-двадцать</i>, <i>тридцать</i>, <i>пятый</i>, <i>девятый-двадцатый</i>, <i>тридцатый</i>.
      */
-    private static final String[] FIVE_TWENTY_CARD_BASES = {"пят", "шест", "сем", "", "девят", "десят", "одиннадцат",
+    private static final String[] FIVE_TWENTY_BASES = {"пят", "шест", "сем", "", "девят", "десят", "одиннадцат",
             "двенадцат", "тринадцат", "четырнадцат", "пятнадцат", "шестнадцат", "семнадцат",
             "восемнадцат", "девятнадцат", "двадцат", "тридцат"};
     /**
@@ -262,9 +262,13 @@ public class RussianNumeral {
     /**
      * Основы порядковых числительных от 0 до 8.
      */
-    private static final String[] ZERO_EIGHT_ORD_BASES = {"нулев", "перв", "втор", "трет", "четверт", "", "шест",
+    private static final String[] ZERO_EIGHT_ORD_BASES = {"нулев", "перв", "втор", "трет", "четвёрт", "", "шест",
             "седьм", "восьм"};
     //</editor-fold>
+    /**
+     * Склонение - родительный падеж, чтобы не создавать несколько идентичных экземпляров.
+     */
+    private static final Declension GENITIVE_DECLENSION = new Declension(null, Case.GENITIVE, null, null, null);
     /**
      * Выдаёт число прописью.
      * @param num число
@@ -401,6 +405,7 @@ public class RussianNumeral {
             if (d.adjCheck()) return modifyForAnimacy(ZERO_EIGHT_ORD_BASES[3], SOFT_ORD_ENDINGS[ending], d);
             return ZERO_EIGHT_ORD_BASES[3] + SOFT_ORD_ENDINGS[ending][d.gramCase.ordinal()];
         }
+        // эти числительные имеют окончание ой в начальной форме
         if (num == 0 || num == 2 || num == 6 || num == 7 || num == 8 || num == 40) {
             res = num == 40 ? "сороков" : ZERO_EIGHT_ORD_BASES[num];
             // используем окончание ой в именительном / винительном (у неодуш.) падеже мужского рода
@@ -413,13 +418,44 @@ public class RussianNumeral {
                 */
                 if (d.gramCase == Case.ACCUSATIVE) return modifyForAnimacy(res, new String[]{"ой", "ого"}, d);
             }
-            // TODO: может, это перенести в конец?
+        }
+        // получаем основы числительных 1, 4, 5-20, (3-9)0, (1-9)00, 1k, 1m, 1b
+        res = res.isEmpty() ? getOrdBases(num) : res; // исключаем вероятно ошибочные 6-8
+        if (!res.isEmpty()) { // если есть основа с твёрдыми окончаниями
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
             if (d.adjCheck()) return modifyForAnimacy(res, HARD_ORD_ENDINGS[ending], d);
             // в остальных случаях используем стандартный набор твёрдых окончаний
             return res + HARD_ORD_ENDINGS[ending][d.gramCase.ordinal()];
         }
+        if (num == 50 || num == 60 || num == 70 || num == 80) {
+            return getCardinalNumeral(num / 10, GENITIVE_DECLENSION) // I часть в форме родительного падежа
+                    + getOrdinalNumeral(10, d); // вторая часть изменяется как числительное десятый
+        }
         return res;
+    }
+
+    /**
+     * Вспомогательная функция, выдаёт основы порядковых числительных с твёрдыми окончаниями.
+     * @param num число
+     * @return основа числительного
+     */
+    private static String getOrdBases(int num) {
+        if (num == 1 || num == 4) { // у этих чисел особые основы
+            return ZERO_EIGHT_ORD_BASES[num];
+        }
+        if ((num > 4 && num < 21) || (num == 30)) { // 5 - 20, 30
+            int base = num == 30 ? 16 : num - 5;
+            return FIVE_TWENTY_BASES[base];
+        }
+        if (num == 90) return "девяност";
+        if (num == 100) return "сот";
+        if (num == 200 || num == 300 || num == 400 || num == 500 || num == 600 || num == 700 || num == 800 || num == 900) {
+            return getCardinalNumeral(num, GENITIVE_DECLENSION); // основа совпадает с числительным в родительном падеже
+        }
+        if (num == 1000) return "тысячн";
+        if (num == 10e5) return "миллионн";
+        if (num == 10e8) return "миллиардн";
+        return "";
     }
     /**
      * Выдаёт количественное числительное в нужной форме.
@@ -464,7 +500,7 @@ public class RussianNumeral {
         if ((num > 4 && num < 21) || (num == 30)) { // 5 - 20, 30
             if (num == 8) return EIGHT_CARD_CASES[d.gramCase.ordinal()]; // у числительного восемь учитываем беглую гласную
             int base = num == 30 ? 16 : num - 5;
-            return FIVE_TWENTY_CARD_BASES[base] + FIVE_TWENTY_CARD_ENDINGS[d.gramCase.ordinal()];
+            return FIVE_TWENTY_BASES[base] + FIVE_TWENTY_CARD_ENDINGS[d.gramCase.ordinal()];
         }
         if (num == 50 || num == 60 || num == 70 || num == 80) {
             return getCardinalNumeral(num / 10, d) + "десят" + // в именительном и винительном падеже нулевое ок.
