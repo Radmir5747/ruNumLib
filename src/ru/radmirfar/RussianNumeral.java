@@ -126,7 +126,7 @@ public class RussianNumeral {
      * </ul>
      */
     private static final String[][] HARD_ORD_ENDINGS = {
-            {"ый", "ого", "ому", "", "ым", "ом"}, /*2, 6, 8, 40 - именительный падеж - ой!*/
+            {"ый", "ого", "ому", "", "ым", "ом"},
             {"ая", "ой", "ой", "ую", "ой", "ой"},
             {"ое", "ого", "ому", "ое", "ым", "ом"},
             {"ые", "ых", "ым", "", "ыми", "ых"}
@@ -396,10 +396,28 @@ public class RussianNumeral {
         if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
         String res = "";
         int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
-        if (num == 3) {
+        if (num == 3) { // числительное третий использует набор мягких окончаний
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
             if (d.adjCheck()) return modifyForAnimacy(ZERO_EIGHT_ORD_BASES[3], SOFT_ORD_ENDINGS[ending], d);
             return ZERO_EIGHT_ORD_BASES[3] + SOFT_ORD_ENDINGS[ending][d.gramCase.ordinal()];
+        }
+        if (num == 0 || num == 2 || num == 6 || num == 7 || num == 8 || num == 40) {
+            res = num == 40 ? "сороков" : ZERO_EIGHT_ORD_BASES[num];
+            // используем окончание ой в именительном / винительном (у неодуш.) падеже мужского рода
+            if (d.gender == Gender.MASCULINE && d.count == Count.SINGULAR) {
+                if (d.gramCase == Case.NOMINATIVE) return res + "ой"; // в именительном падеже окончание ой
+                /*
+                 Для винительного падежа учитываем одушевлённость. Почему это работает? Винительный падеж использует
+                 формы именительного или родительного падежа в зависимости от одушевлённости. Значения enum'а
+                 для этих падежей - 0 и 1 соотв. Мы гарантированно не выйдем за пределы массива.
+                */
+                if (d.gramCase == Case.ACCUSATIVE) return modifyForAnimacy(res, new String[]{"ой", "ого"}, d);
+            }
+            // TODO: может, это перенести в конец?
+            // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
+            if (d.adjCheck()) return modifyForAnimacy(res, HARD_ORD_ENDINGS[ending], d);
+            // в остальных случаях используем стандартный набор твёрдых окончаний
+            return res + HARD_ORD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         return res;
     }
