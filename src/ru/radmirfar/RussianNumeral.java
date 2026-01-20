@@ -129,7 +129,8 @@ public class RussianNumeral {
             {"ый", "ого", "ому", "", "ым", "ом"}, /*2, 6, 8, 40 - именительный падеж - ой!*/
             {"ая", "ой", "ой", "ую", "ой", "ой"},
             {"ое", "ого", "ому", "ое", "ым", "ом"},
-            {"ые", "ых", "ым", "", "ыми", "ых"}};
+            {"ые", "ых", "ым", "", "ыми", "ых"}
+    };
     /**
      * <p>Окончания порядковых числительных с мягкой основой. Индексы массива обозначают окончания:</p>
      * <ul>
@@ -143,7 +144,8 @@ public class RussianNumeral {
             {"ий", "ьего", "ьему", "", "ьим", "ьем"},
             {"ья", "ьей", "ьей", "ью", "ьей", "ьей"},
             {"ье", "ьего", "ьему", "ье", "ьим", "ьем"},
-            {"ьи", "ьих", "ьим", "", "ьими", "ьих"}};
+            {"ьи", "ьих", "ьим", "", "ьими", "ьих"}
+    };
     /**
      * <p>Окончания собирательных числительных. Индексы массива обозначают окончания:</p>
      * <ul>
@@ -253,6 +255,15 @@ public class RussianNumeral {
      * Окончания именительного падежа падежей сложных числительных, оканчивающихся на <i>сто / ста / сти</i>
      */
     private static final String[] HUNDRED_CARD_NOM_ENDINGS = {"сти", "ста", "сот"};
+    /**
+     * Варианты числа 0 - ноль или нуль.
+     */
+    private static final String[] NULL_FORMS = {"нол", "нул"};
+    /**
+     * Основы порядковых числительных от 0 до 8.
+     */
+    private static final String[] ZERO_EIGHT_ORD_BASES = {"нул", "перв", "втор", "трет", "четверт", "пят", "шест",
+            "сем", "восем"};
     //</editor-fold>
     /**
      * Выдаёт число прописью.
@@ -375,7 +386,7 @@ public class RussianNumeral {
     /**
      * Выдаёт порядковое числительное в нужной форме.
      * @param num число
-     * @param d грамматические признаки (род, падеж, грамматическое число)
+     * @param d грамматические признаки (род, падеж, грамматическое число, одушевлённость)
      * @return число прописью
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
@@ -383,6 +394,12 @@ public class RussianNumeral {
         if (d.gender == null || d.gramCase == null || d.count == null)
             throw new IllegalArgumentException("Insufficient arguments");
         String res = "";
+        int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
+        if (num == 3) {
+            // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
+            if (d.adjCheck()) return modifyForAnimacy(ZERO_EIGHT_ORD_BASES[3], SOFT_ORD_ENDINGS[ending], d);
+            return ZERO_EIGHT_ORD_BASES[3] + SOFT_ORD_ENDINGS[ending][d.gramCase.ordinal()];
+        }
         return res;
     }
     /**
@@ -405,7 +422,7 @@ public class RussianNumeral {
             return res + MILLION_CARD_ENDINGS[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 0) { // ноль - не числительное, но в его образовании участвует
-            return "нол" + new String[]{"ь", "я", "ю", "ь", "ём", "е"}[d.gramCase.ordinal()];
+            return NULL_FORMS[0] + new String[]{"ь", "я", "ю", "ь", "ём", "е"}[d.gramCase.ordinal()];
         }
         if (num == 1) {
             if (d.gender == null) throw new IllegalArgumentException("Missing gender");
@@ -413,9 +430,7 @@ public class RussianNumeral {
             res = "од";
             int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
-            if (d.gramCase == Case.ACCUSATIVE && (d.gender == Gender.MASCULINE || d.count == Count.PLURAL)) {
-                return modifyForAnimacy(res, ONE_CARD_ENDINGS[ending], d);
-            }
+            if (d.adjCheck()) return modifyForAnimacy(res, ONE_CARD_ENDINGS[ending], d);
             return res + ONE_CARD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         if (num > 1 && num < 5) { // 2, 3, 4
