@@ -293,7 +293,7 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствует падеж
      */
     public static String getNumeral(double num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         return res;
     }
@@ -307,7 +307,7 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствует падеж
      */
     public static String getNumeral(Fraction num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         return res;
     }
@@ -391,8 +391,9 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     private static String getOrdinalNumeral(int num, Declension d) {
-        if (d.gender == null || d.gramCase == null || d.count == null)
-            throw new IllegalArgumentException("Insufficient arguments");
+        if (d.gender == null) throw new IllegalArgumentException("Missing gender");
+        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
+        if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
         String res = "";
         int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
         if (num == 3) {
