@@ -262,8 +262,8 @@ public class RussianNumeral {
     /**
      * Основы порядковых числительных от 0 до 8.
      */
-    private static final String[] ZERO_EIGHT_ORD_BASES = {"нул", "перв", "втор", "трет", "четверт", "пят", "шест",
-            "сем", "восем"};
+    private static final String[] ZERO_EIGHT_ORD_BASES = {"нулев", "перв", "втор", "трет", "четверт", "", "шест",
+            "седьм", "восьм"};
     //</editor-fold>
     /**
      * Выдаёт число прописью.
