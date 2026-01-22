@@ -266,6 +266,10 @@ public class RussianNumeral {
             "седьм", "восьм"};
     //</editor-fold>
     /**
+     * Склонение - именительный падеж, чтобы не создавать несколько идентичных экземпляров.
+     */
+    private static final Declension NOMINATIVE_DECLENSION = new Declension(null, Case.NOMINATIVE, null, null, null);
+    /**
      * Склонение - родительный падеж, чтобы не создавать несколько идентичных экземпляров.
      */
     private static final Declension GENITIVE_DECLENSION = new Declension(null, Case.GENITIVE, null, null, null);
@@ -431,6 +435,14 @@ public class RussianNumeral {
             return getCardinalNumeral(num / 10, GENITIVE_DECLENSION) // I часть в форме родительного падежа
                     + getOrdinalNumeral(10, d); // вторая часть изменяется как числительное десятый
         }
+        if (num > 20 && num < 100) { // составные числительные для двузначных чисел
+            return getCardinalNumeral(num / 10 * 10, NOMINATIVE_DECLENSION) + " "
+                    + getOrdinalNumeral(num % 10, d);
+        }
+        if (num > 100 && num < 1000) { // составные числительные для трёхзначных чисел
+            return getCardinalNumeral(num / 100 * 100, NOMINATIVE_DECLENSION) + " "
+                    + getOrdinalNumeral(num % 100, d);
+        }
         return res;
     }
 
@@ -587,7 +599,7 @@ public class RussianNumeral {
      */
     private static Declension supplementalDeclension(int num, boolean isThousand, Declension d) {
         num %= 100; // приводим число к двузначному
-        DeclensionBuilder out = new DeclensionBuilder(d.gramCase).type(Type.CARDINAL);
+        DeclensionBuilder out = new DeclensionBuilder(d.gramCase);
         if (num == 0) {
             // ноль управляет словами, ставя их в форму родительного падежа множественного числа:
             // ноль тысяч, нуля тысяч, нулю тысяч, нулём тысяч, о нуле тысяч
