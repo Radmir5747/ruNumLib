@@ -561,6 +561,7 @@ public class RussianNumeral {
             DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
             if (i != 0) { // последний разряд согласуется с существительным
                 baseDeclension.animacy(Animacy.INANIMATE); // снимаем одушевлённость (убить *трёх тысячи)
+                baseDeclension.count(Count.SINGULAR); // снимаем множественное число (*одни тысяча сто одни)
                 if (i == 1) baseDeclension.gender(Gender.FEMININE); // слово тысяча женского рода
                 else baseDeclension.gender(Gender.MASCULINE);
             }
