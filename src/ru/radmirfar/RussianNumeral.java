@@ -439,7 +439,7 @@ public class RussianNumeral {
             return getCardinalNumeral(num / 10 * 10, NOMINATIVE_DECLENSION) + " "
                     + getOrdinalNumeral(num % 10, d);
         }
-        if (num > 100 && num < 1000) { // составные числительные для трёхзначных чисел
+        if (num % 100 != 0) { // у составных числительных порядковым становится только последнее слово
             return getCardinalNumeral(num / 100 * 100, NOMINATIVE_DECLENSION) + " "
                     + getOrdinalNumeral(num % 100, d);
         }
@@ -549,14 +549,9 @@ public class RussianNumeral {
             return getCardinalNumeral(num / 100 * 100, d) + " " + getCardinalNumeral(num % 100, d);
         }
         // разбиваем числа больше 999 на разряды
-        int baseCount = (int)Math.log10(num) / 3; // количество разрядов
-        Integer[] nums = new Integer[baseCount + 1];
-        for (int i = 0; i <= baseCount; i++) { // разделяем число на разряды, начиная с последнего (самый высокий будет в конце)
-            nums[i] = num % 1000;
-            num /= 1000;
-        }
+        int[] nums = getBases(num);
         // идём с конца
-        for (int i = baseCount; i >= 0; i--) {
+        for (int i = nums.length - 1; i >= 0; i--) {
             if (nums[i] == 0) continue; // разряды с нулём не отражаются на письме (*ноль тысяч девятнадцать)
             DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
             if (i != 0) { // последний разряд согласуется с существительным
@@ -572,6 +567,21 @@ public class RussianNumeral {
                             new DeclensionBuilder(d).build())) + " ";
         }
         return res;
+    }
+
+    /**
+     * Вспомогательная функция, разбивает число на разряды.
+     * @param num число
+     * @return массив с разрядами числа
+     */
+    private static int[] getBases(int num) {
+        int baseCount = (int)Math.log10(num) / 3; // количество разрядов
+        int[] nums = new int[baseCount + 1];
+        for (int i = 0; i <= baseCount; i++) { // разделяем число на разряды, начиная с последнего (самый высокий будет в конце)
+            nums[i] = num % 1000;
+            num /= 1000;
+        }
+        return nums;
     }
 
     /**
