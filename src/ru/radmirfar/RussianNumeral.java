@@ -266,9 +266,9 @@ public class RussianNumeral {
             "седьм", "восьм"};
     //</editor-fold>
     /**
-     * Склонение - именительный падеж, чтобы не создавать несколько идентичных экземпляров.
+     * Склонение - единственное число именительный падеж, чтобы не создавать несколько идентичных экземпляров.
      */
-    private static final Declension NOMINATIVE_DECLENSION = new Declension(null, Case.NOMINATIVE, null, null, null);
+    private static final Declension NOMINATIVE_DECLENSION = new Declension(null, Case.NOMINATIVE, Count.SINGULAR, null, null);
     /**
      * Склонение - родительный падеж, чтобы не создавать несколько идентичных экземпляров.
      */
@@ -443,7 +443,33 @@ public class RussianNumeral {
             return getCardinalNumeral(num / 100 * 100, NOMINATIVE_DECLENSION) + " "
                     + getOrdinalNumeral(num % 100, d);
         }
-        return res;
+        // сложное порядковое числительное с большими классами (тысяча, миллион и проч.)
+        int baseCount = 0;
+        while (num % 1000 == 0) { // доходим до последнего ненулевого разряда
+            num /= 1000;
+            baseCount++;
+        }
+        if (num > 1000) {
+            /*
+             Если есть классы впереди, порядковым числительным становится последний класс:
+             три миллиарда два миллиона тысячный.
+             https://gramota.ru/spravka/vopros/271407#question
+            */
+            // TODO: сюда можно добавить возможность выбирать: тысяча или одна тысяча
+            res += getCardinalNumeral((int) (num / 1000 * Math.pow(1000, baseCount + 1)), NOMINATIVE_DECLENSION) + " ";
+        }
+        num %= 1000; // выделяем последний разряд
+        // TODO: можно сделать красивее
+        int hundreds = num / 100 * 100;
+        if (hundreds == 100) res += "сто"; // стотысячный, а не *статысячный
+        else if (hundreds > 100) res += getCardinalNumeral(hundreds, GENITIVE_DECLENSION);
+        int tens = num % 100 / 10 * 10;
+        if (tens == 90) res += "девяносто"; // девяностотысячный, а не *девяностатысячный
+        else if (tens > 0) res += getCardinalNumeral(tens, GENITIVE_DECLENSION);
+        num %= 10;
+        if (num == 1) res += "одно"; // двадцатиоднотысячный, а не *двадцатиодноготысячный
+        else if (num > 1) res += getCardinalNumeral(num, new DeclensionBuilder(Case.GENITIVE).gender(Gender.MASCULINE).build());
+        return res + getOrdinalNumeral((int) Math.pow(1000, baseCount), d); // р
     }
 
     /**
@@ -551,6 +577,7 @@ public class RussianNumeral {
         // разбиваем числа больше 999 на разряды
         int[] nums = getBases(num);
         // идём с конца
+        // TODO: сюда можно добавить возможность выбирать: тысяча или одна тысяча
         for (int i = nums.length - 1; i >= 0; i--) {
             if (nums[i] == 0) continue; // разряды с нулём не отражаются на письме (*ноль тысяч девятнадцать)
             DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
