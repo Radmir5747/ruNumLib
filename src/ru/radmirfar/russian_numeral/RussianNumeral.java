@@ -1,5 +1,4 @@
-package ru.radmirfar;
-import ru.radmirfar.russian_numeral.*;
+package ru.radmirfar.russian_numeral;
 
 public class RussianNumeral {
     //<editor-fold desc="Константы - окончания и основы">
