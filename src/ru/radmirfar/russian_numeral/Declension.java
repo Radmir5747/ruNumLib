@@ -24,34 +24,35 @@ public class Declension {
      */
     static Declension supplementalDeclension(int num, boolean isThousand, Declension d) {
         num %= 100; // приводим число к двузначному
-        DeclensionBuilder out = new DeclensionBuilder(d.gramCase);
         if (num == 0) {
-            // ноль управляет словами, ставя их в форму родительного падежа множественного числа:
-            // ноль тысяч, нуля тысяч, нулю тысяч, нулём тысяч, о нуле тысяч
-            out.count(Count.PLURAL).gramCase(Case.GENITIVE);
-        } else if (num % 10 == 1 && num != 11) {
-            // если число оканчивается на 1, то оно ставит слово в форму единственного числа
-            out.count(Count.SINGULAR);
-        } else if ((num % 10 == 2 && num != 12) || (num % 10 == 3 && num != 13) || (num % 10 == 4 && num != 14)) {
-            // числа, оканчивающиеся на 2, 3, 4 кроме чисел 12, 13, 14
-            // ставим слово в форму множественного числа
-            out.count(Count.PLURAL);
-            // для числительных миллион, миллиард и т.п. именительный и винительный падеж принимают форму
-            // родительного падежа единственного числа: два миллиона (не *два миллионы)
+            /*
+             Ноль управляет словами, ставя их в форму родительного падежа множественного числа:
+             ноль тысяч, нуля тысяч, нулю тысяч, нулём тысяч, о нуле тысяч
+            */
+            return new Declension(null, Case.GENITIVE, Count.PLURAL, null, null);
+        }
+        if (num % 10 == 1 && num != 11) {
+            // если число оканчивается на 1, то оно ставит слово в форму единственного числа, сохраняя его падеж
+            return new Declension(null, d.gramCase, Count.SINGULAR, null, null);
+        }
+        if ((num % 10 == 2 && num != 12) || (num % 10 == 3 && num != 13) || (num % 10 == 4 && num != 14)) {
+            /*
+             Числа, оканчивающиеся на 2, 3, 4 кроме чисел 12, 13, 14.
+             Для числительных миллион, миллиард и т.п. именительный и винительный падеж принимают форму
+             родительного падежа единственного числа: два миллиона (не *два миллионы)
+            */
             if (d.isNomAcc() && !isThousand) {
-                out.count(Count.SINGULAR);
-                out.gramCase(Case.GENITIVE);
+                return new Declension(null, Case.GENITIVE, Count.SINGULAR, null, null);
             }
+            // в остальных падежах ставим слово в форму множественного числа, сохраняя его падеж
+            return new Declension(null, d.gramCase, Count.PLURAL, null, null);
         }
-        else {
-            out.count(Count.PLURAL);
-            // именительный и винительный падеж принимают форму родительного падежа множественного числа:
-            // пять тысяч, миллионов (не *пять тысячи, *пять миллионы)
-            if (d.isNomAcc()) {
-                out.gramCase(Case.GENITIVE);
-            }
-        }
-        return out.build();
+        /*
+         Для всех остальных чисел.
+         Именительный и винительный падеж принимают форму родительного падежа множественного числа:
+         пять тысяч, миллионов (не *пять тысячи, *пять миллионы). Иначе падеж сохраняется.
+        */
+        return new Declension(null, d.isNomAcc() ? Case.GENITIVE : d.gramCase, Count.PLURAL, null, null);
     }
 
     /**
