@@ -31,7 +31,6 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствует падеж
      */
     public static String getNumeral(double num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         return res;
     }
@@ -45,7 +44,6 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствует падеж
      */
     public static String getNumeral(Fraction num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         return res;
     }
@@ -65,7 +63,6 @@ public class RussianNumeral {
      * необходимые грамматические характеристики.
      */
     public static String getCollectiveNumeral(int num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
         String res = COLLECTIVE_NUMERAL_BASES[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
@@ -86,7 +83,6 @@ public class RussianNumeral {
      */
     public static String getBoth(Declension d) {
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         int base = d.gender == Gender.FEMININE ? 1 : 0; // в зависимости от рода используем набор окончаний
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
             return modifyForAnimacy("об", BOTH_ENDINGS[base], d);
@@ -103,7 +99,6 @@ public class RussianNumeral {
      */
     public static String getOneAndAHalf(Declension d) {
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (d.isNomAcc()) { // в именительном и винительном падеже
             if (d.gender == Gender.FEMININE) return "полторы"; // у женского рода полторы
             return "полтора"; // у мужского и среднего рода полтора
@@ -130,7 +125,6 @@ public class RussianNumeral {
      */
     private static String getOrdinalNumeral(int num, Declension d) {
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
         String res = "";
         int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
@@ -233,7 +227,6 @@ public class RussianNumeral {
      * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
      */
     private static String getCardinalNumeral(int num, Declension d) {
-        if (d.gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         String res = "";
         if (num == 1000) {
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");

@@ -63,6 +63,7 @@ public class Declension {
      * @param animacy одушевлённость
      */
     Declension(Gender gender, Case gramCase, Count count, Type type, Animacy animacy) {
+        if (gramCase == null) throw new IllegalArgumentException("Missing grammatical case");
         this.gender = gender;
         this.gramCase = gramCase;
         this.count = count;
