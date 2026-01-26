@@ -10,7 +10,42 @@ class RussianNumeralTest {
 
     @Test
     @Disabled("Not implemented")
-    void getNumeral() {
+    @DisplayName("Порядковые числительные")
+    void getOrdinalNumeral() {
+
+    }
+    @Test
+    @DisplayName("Целые количественные числительные")
+    void getCardinalNumeral() {
+        System.out.println("Для тысячи, миллиона, миллиарда должно быть грамматическое число, иначе " +
+                "должен выдать IllegalArgumentException");
+        Declension d1 = new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null);
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1000, d1)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)10e5, d1)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)10e8, d1)));
+        System.out.println("Тысяча, миллион, миллиард");
+        String[][][] strings1 = {{{"тысяча", "тысячи", "тысяче", "тысячу", "тысячей", "тысяче"},
+                {"тысячи", "тысяч", "тысячам", "тысячи", "тысячами", "тысячах"}},
+        {{"миллион", "миллиона", "миллиону", "миллион", "миллионом", "миллионе"},
+                {"миллионы", "миллионов", "миллионам", "миллионы", "миллионами", "миллионах"}},
+        {{"миллиард", "миллиарда", "миллиарду", "миллиард", "миллиардом", "миллиарде"},
+                {"миллиарды", "миллиардов", "миллиардам", "миллиарды", "миллиардами", "миллиардах"}}};
+        int[] bigNums = new int[]{1000, (int) 10e5, (int) 10e8};
+        for (int i = 0; i < bigNums.length; i++) {
+            for (Case c : Case.values()) {
+                for (Count cnt : Count.values()) {
+                    assertEquals(strings1[i][cnt.ordinal()][c.ordinal()], RussianNumeral.getNumeral(bigNums[i],
+                            new Declension(null, c, cnt, Type.CARDINAL, null)));
+                }
+            }
+        }
+        System.out.println("Формы числительного ноль");
+        String[] nullForms = {"ноль", "ноля", "нолю", "ноль", "нолём", "ноле"};
+        for (Case c : Case.values()) {
+            assertEquals(nullForms[c.ordinal()], RussianNumeral.getNumeral(0,
+                    new Declension(null, c, null, Type.CARDINAL, null)));
+        }
+        // to be continued
     }
 
     @Test
