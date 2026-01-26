@@ -72,6 +72,18 @@ public class Declension {
     }
 
     /**
+     * Конструктор копирования.
+     * @param d экземпляр класса Declension
+     */
+    Declension(Declension d) {
+        this.gender = d.gender;
+        this.gramCase = d.gramCase;
+        this.count = d.count;
+        this.type = d.type;
+        this.animacy = d.animacy;
+    }
+
+    /**
      * <p>Вспомогательная функция для сокращения условий.</p>
      * @return true, если падеж именительный или винительный
      */
