@@ -61,7 +61,7 @@ class RussianNumeralTest {
         assertAll(() -> assertEquals("один", RussianNumeral.getNumeral(1,
                 new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))),
                 () -> assertEquals("одно", RussianNumeral.getNumeral(1,
-                        new Declension(Gender.NEUTRAL, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))));
+                        new Declension(Gender.NEUTER, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))));
         System.out.println("Формы винительного падежа должны отличаться в зависимости от одушевлённости");
         for (Count cnt : Count.values()) {
             String result1 = RussianNumeral.getNumeral(1,
@@ -167,7 +167,7 @@ class RussianNumeralTest {
     void getOneAndAHalf() {
         Declension femNomDeclension = new Declension(Gender.FEMININE, Case.NOMINATIVE, null, null, null);
         Declension mascNomDeclension = new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, null, null);
-        Declension neuNomDeclension = new Declension(Gender.NEUTRAL, Case.NOMINATIVE, null, null, null);
+        Declension neuNomDeclension = new Declension(Gender.NEUTER, Case.NOMINATIVE, null, null, null);
         Declension baseDeclension = new Declension(null, Case.INSTRUMENTAL, null, null, null);
         System.out.println("В женском роде для именительного падежа - полторы");
         assertEquals("полторы", RussianNumeral.getOneAndAHalf(femNomDeclension));

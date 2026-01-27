@@ -6,7 +6,7 @@ package ru.radmirfar.russian_numeral;
  * <ul>
  * <li>{@link #MASCULINE} - мужской</li>
  * <li>{@link #FEMININE} - женский</li>
- * <li>{@link #NEUTRAL} - средний</li>
+ * <li>{@link #NEUTER} - средний</li>
  * </ul>
  */
 public enum Gender {
@@ -21,5 +21,5 @@ public enum Gender {
     /**
      * Средний род
      */
-    NEUTRAL
+    NEUTER
 }
