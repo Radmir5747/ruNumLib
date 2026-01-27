@@ -287,9 +287,12 @@ public class RussianNumeral {
         }
         if (num > 20 && num < 100) { // составные числительные для двузначных чисел
             // снимаем одушевлённость с числительных два-четыре
-            // составное количественное числительное управляет существительным: люблю двести семьдесят три ученика
-            // НО люблю двести семьдесят одного ученика
+            // В конструкциях с составными числительными, оканчивающимися на два, три, четыре, винительный падеж
+            // сохраняет форму именительного независимо от категории одушевленности: люблю двести семьдесят три ученика
+            // https://gramota.ru/spravka/vopros/296810
             // https://gramota.ru/spravka/vopros/322608
+            // НО вижу двадцать одного мальчика
+            // https://gramota.ru/spravka/vopros/210165
             Declension newDeclension = num % 10 == 1 ? d : new DeclensionBuilder(d).animacy(Animacy.INANIMATE).build();
             return getCardinalNumeral(num / 10 * 10, d) + " " + getCardinalNumeral(num % 10, newDeclension);
         }
@@ -301,7 +304,7 @@ public class RussianNumeral {
         // идём с конца
         // TODO: сюда можно добавить возможность выбирать: тысяча или одна тысяча
         for (int i = nums.length - 1; i >= 0; i--) {
-            if (nums[i] == 0) continue; // разряды с нулём не отражаются на письме (*ноль тысяч девятнадцать)
+            if (nums[i] == 0) continue; // классы с нулём не отражаются на письме (*два миллиона ноль тысяч три)
             DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
             if (i != 0) { // последний разряд согласуется с существительным
                 baseDeclension.animacy(Animacy.INANIMATE); // снимаем одушевлённость (убить *трёх тысячи)
@@ -315,7 +318,7 @@ public class RussianNumeral {
             res += " " + getCardinalNumeral((int)Math.pow(1000, i), Declension.supplementalDeclension(nums[i], i == 1,
                             new DeclensionBuilder(d).build())) + " ";
         }
-        return res;
+        return res.strip(); // убираем лишние пробелы в конце
     }
 
     /**
