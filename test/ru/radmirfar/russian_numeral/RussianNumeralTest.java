@@ -45,6 +45,62 @@ class RussianNumeralTest {
             assertEquals(nullForms[c.ordinal()], RussianNumeral.getNumeral(0,
                     new Declension(null, c, null, Type.CARDINAL, null)));
         }
+        System.out.println("Exception'ы для числительного один");
+        System.out.println("Отсутствует всё, должен выдать IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d1));
+        /* в будущем это надо будет поправить */
+        System.out.println("Отсутствует род, должен выдать IllegalArgumentException");
+        Declension d2 = new Declension(null, Case.GENITIVE, Count.SINGULAR, Type.CARDINAL, null);
+        Declension d3 = new Declension(null, Case.GENITIVE, Count.PLURAL, Type.CARDINAL, null);
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d2)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d3)));
+        System.out.println("Отсутствует грамматическое число, должен выдать IllegalArgumentException");
+        Declension d4 = new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, Type.CARDINAL, null);
+        assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d4));
+        System.out.println("Именительный падеж для мужского и среднего рода");
+        assertAll(() -> assertEquals("один", RussianNumeral.getNumeral(1,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))),
+                () -> assertEquals("одно", RussianNumeral.getNumeral(1,
+                        new Declension(Gender.NEUTRAL, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))));
+        System.out.println("Формы винительного падежа должны отличаться в зависимости от одушевлённости");
+        for (Count cnt : Count.values()) {
+            String result1 = RussianNumeral.getNumeral(1,
+                    new Declension(Gender.MASCULINE, Case.ACCUSATIVE, cnt, Type.CARDINAL, Animacy.INANIMATE));
+            String result2 = RussianNumeral.getNumeral(1,
+                    new Declension(Gender.MASCULINE, Case.ACCUSATIVE, cnt, Type.CARDINAL, Animacy.ANIMATE));
+            String expected1 = RussianNumeral.getNumeral(1,
+                    new Declension(Gender.MASCULINE, Case.NOMINATIVE, cnt, Type.CARDINAL, null));
+            String expected2 = RussianNumeral.getNumeral(1,
+                    new Declension(Gender.MASCULINE, Case.GENITIVE, cnt, Type.CARDINAL, null));
+            assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
+        }
+        System.out.println("Для числительного два должен быть род, иначе должен выдать IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(2, d2));
+        System.out.println("Именительный падеж для мужского и женского рода числительного два");
+        assertAll(() -> assertEquals("два", RussianNumeral.getNumeral(2,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, Type.CARDINAL, null))),
+                () -> assertEquals("две", RussianNumeral.getNumeral(2,
+                        new Declension(Gender.FEMININE, Case.NOMINATIVE, null, Type.CARDINAL, null))));
+        System.out.println("Три, четыре");
+        assertAll(() -> assertEquals("три", RussianNumeral.getNumeral(3,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, Type.CARDINAL, null))),
+                () -> assertEquals("четыре", RussianNumeral.getNumeral(4,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, Type.CARDINAL, null))));
+        System.out.println("Формы винительного падежа числительных два-четыре должны отличаться " +
+                "в зависимости от одушевлённости");
+        for (int i = 2; i < 5; i++) {
+            for (Gender g : Gender.values()) {
+                String result1 = RussianNumeral.getNumeral(i,
+                        new Declension(g, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.INANIMATE));
+                String result2 = RussianNumeral.getNumeral(i,
+                        new Declension(g, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE));
+                String expected1 = RussianNumeral.getNumeral(i,
+                        new Declension(g, Case.NOMINATIVE, null, Type.CARDINAL, null));
+                String expected2 = RussianNumeral.getNumeral(i,
+                        new Declension(g, Case.GENITIVE, null, Type.CARDINAL, null));
+                assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
+            }
+        }
         // to be continued
     }
 
