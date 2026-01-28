@@ -15,6 +15,16 @@ class RussianNumeralTest {
     }
 
     @Test
+    @DisplayName("Прочие проверки")
+    void otherChecks() {
+        System.out.println("Проверка отрицательных чисел");
+        assertAll(() -> assertEquals("минус один", RussianNumeral.getNumeral(-1,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))),
+                () -> assertEquals("минус первый", RussianNumeral.getNumeral(-1,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))));
+    }
+
+    @Test
     @DisplayName("Целые порядковые числительные")
     void getOrdinalNumeral() {
         Declension d1 = new Declension(null, Case.NOMINATIVE, null, Type.ORDINAL, null);
@@ -338,6 +348,8 @@ class RussianNumeralTest {
                     () -> assertEquals(seventyThreeForms[c.ordinal()], RussianNumeral.getNumeral(73,
                             new Declension(null, c, null, Type.CARDINAL, Animacy.ANIMATE))));
         }
+        assertEquals("две тысячи двести пятьдесят три", RussianNumeral.getNumeral(2253,
+                new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE)));
         System.out.println("...только если они не оканчиваются на один");
         assertAll(() -> assertEquals("двадцать один", RussianNumeral.getNumeral(21,
                 new Declension(Gender.MASCULINE, Case.ACCUSATIVE, Count.SINGULAR, Type.CARDINAL, Animacy.INANIMATE))),
@@ -387,8 +399,13 @@ class RussianNumeralTest {
                 RussianNumeral.getNumeral(19000006, new Declension(null, Case.NOMINATIVE,null,
                         Type.CARDINAL, null)));
         System.out.println("С классов снимается одушевлённость: вижу две тысячи (человек)");
-        assertEquals("две тысячи", RussianNumeral.getNumeral(2000,
-                new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE)));
+        assertAll(()-> assertEquals("две тысячи", RussianNumeral.getNumeral(2000,
+                new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
+                ()-> assertEquals("три миллиона", RussianNumeral.getNumeral(3000000,
+                        new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
+                ()-> assertEquals("четыреста двадцать две тысячи сто двадцать одного",
+                        RussianNumeral.getNumeral(422121,
+                        new Declension(Gender.MASCULINE, Case.ACCUSATIVE, Count.SINGULAR, Type.CARDINAL, Animacy.ANIMATE))));
         System.out.println("С классов снимается множественное число: одна тысяча сто одни (сутки)");
         assertEquals("одна тысяча сто одни", RussianNumeral.getNumeral(1101,
                 new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.PLURAL, Type.CARDINAL, null)));

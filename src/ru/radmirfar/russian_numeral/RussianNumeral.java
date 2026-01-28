@@ -45,7 +45,26 @@ public class RussianNumeral {
      */
     public static String getNumeral(Fraction num, Declension d) {
         String res = "";
-        return res;
+        // числитель и целая часть в форме единственного числа женского рода
+        Declension baseDeclension =
+                new DeclensionBuilder(d).gender(Gender.FEMININE).count(Count.SINGULAR).animacy(Animacy.INANIMATE).build();
+        // TODO: сюда можно добавить возможность выбирать: ноль целых или ничего
+        if (num.whole != 0) {
+            // женский род, единственное число + неодушевлённость (одна целая, две целых)
+            res += getCardinalNumeral(num.whole, baseDeclension) + " ";
+            Declension s = Declension.supplementalDeclension(num.whole, true, d);
+            // заплатка для множественного числа: в именительном и винительном падеже принимает форму
+            // родительного падежа
+            if (s.isNomAcc() && s.count == Count.PLURAL) s = new DeclensionBuilder(s).gramCase(Case.GENITIVE).build();
+            res += "цел" + HARD_ORD_ENDINGS[s.count == Count.PLURAL ? 3 : 1][s.gramCase.ordinal()] + " ";
+        }
+        res += getCardinalNumeral(num.numerator, baseDeclension) + " "; // числитель
+        // знаменатель
+        Declension s = new DeclensionBuilder(Declension.supplementalDeclension(num.numerator, true, d)).
+                gender(Gender.FEMININE).
+                build();
+        if (s.isNomAcc() && s.count == Count.PLURAL) s = new DeclensionBuilder(s).gramCase(Case.GENITIVE).build();
+        return res + getOrdinalNumeral(num.denominator, s);
     }
 
     /**

@@ -5,7 +5,18 @@ package ru.radmirfar.russian_numeral;
  * <p>Поддерживаются простые (2/3, 5/2) и смешанные (1 2/3) дроби, в т.ч. и отрицательные.</p>
  */
 public class Fraction {
-    int whole, numerator, denominator; // целая часть, числитель, знаменатель
+    /**
+     * Целая часть
+     */
+    int whole;
+    /**
+     * Числитель
+     */
+    int numerator;
+    /**
+     * Знаменатель
+     */
+    int denominator;
 
     /**
      * Геттер числителя дроби
