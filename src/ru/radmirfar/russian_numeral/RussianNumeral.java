@@ -162,9 +162,14 @@ public class RussianNumeral {
             return getCardinalNumeral(num / 10 * 10, NOMINATIVE_DECLENSION) + " "
                     + getOrdinalNumeral(num % 10, d);
         }
-        if (num % 100 != 0) { // у составных числительных порядковым становится только последнее слово
-            return getCardinalNumeral(num / 100 * 100, NOMINATIVE_DECLENSION) + " "
-                    + getOrdinalNumeral(num % 100, d);
+        if (num % 1000 != 0) { // если имеются единицы-десятки-сотни
+            if (num % 100 != 0) { // \d+YZ: порядковым числительным становится YZ, а \d+00 становится количественным
+                return getCardinalNumeral(num / 100 * 100, NOMINATIVE_DECLENSION) + " "
+                        + getOrdinalNumeral(num % 100, d);
+            }
+            // \d+X00: порядковым числительным становится X00, а \d+000 становится количественным
+            return getCardinalNumeral(num / 1000 * 1000, NOMINATIVE_DECLENSION) + " " +
+                    getOrdinalNumeral(num % 1000, d);
         }
         // сложное порядковое числительное с большими классами (тысяча, миллион и проч.)
         int baseCount = 0;
@@ -182,17 +187,21 @@ public class RussianNumeral {
             res += getCardinalNumeral((int) (num / 1000 * Math.pow(1000, baseCount + 1)), NOMINATIVE_DECLENSION) + " ";
         }
         num %= 1000; // выделяем последний разряд
-        // TODO: можно сделать красивее
-        int hundreds = num / 100 * 100;
-        if (hundreds == 100) res += "сто"; // стотысячный, а не *статысячный
-        else if (hundreds > 100) res += getCardinalNumeral(hundreds, GENITIVE_DECLENSION);
-        int tens = num % 100 / 10 * 10;
-        if (tens == 90) res += "девяносто"; // девяностотысячный, а не *девяностатысячный
-        else if (tens > 0) res += getCardinalNumeral(tens, GENITIVE_DECLENSION);
-        num %= 10;
-        if (num == 1) res += "одно"; // двадцатиоднотысячный, а не *двадцатиодноготысячный
-        else if (num > 1) res += getCardinalNumeral(num, new DeclensionBuilder(Case.GENITIVE).gender(Gender.MASCULINE).build());
-        return res + getOrdinalNumeral((int) Math.pow(1000, baseCount), d); // р
+        int hundreds = num / 100;
+        if (hundreds == 1) res += "сто"; // стотысячный, а не *статысячный
+        else if (hundreds > 1) res += getCardinalNumeral(hundreds * 100, GENITIVE_DECLENSION);
+        num %= 100;
+        if (num > 10 && num < 20) res += getCardinalNumeral(num, GENITIVE_DECLENSION); // 11-19
+        else {
+            int tens = num / 10;
+            if (tens == 9) res += "девяносто"; // девяностотысячный, а не *девяностатысячный
+            else if (tens > 0) res += getCardinalNumeral(tens * 10, GENITIVE_DECLENSION);
+            num %= 10;
+            if (num == 1) res += "одно"; // двадцатиоднотысячный, а не *двадцатиодноготысячный
+            else if (num > 1)
+                res += getCardinalNumeral(num, new DeclensionBuilder(Case.GENITIVE).gender(Gender.MASCULINE).build());
+        }
+        return res + getOrdinalNumeral((int) Math.pow(1000, baseCount), d);
     }
 
     /**

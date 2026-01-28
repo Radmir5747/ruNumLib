@@ -8,6 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class RussianNumeralTest {
 
     @Test
+    @DisplayName("Проверка исключений при отсутствии падежа")
+    void checkCaseExceptions() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Declension(null, null, null, null, null));
+    }
+
+    @Test
     @DisplayName("Целые порядковые числительные")
     void getOrdinalNumeral() {
         Declension d1 = new Declension(null, Case.NOMINATIVE, null, Type.ORDINAL, null);
@@ -105,7 +112,73 @@ class RussianNumeralTest {
                 assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
             }
         }
-        // to be continued
+        String[] test5 = {"пятидесятый", "шестидесятый", "семидесятый", "восьмидесятый"};
+        for (int i = 5; i < 9; i++) {
+            assertEquals(test5[i - 5], RussianNumeral.getNumeral(i * 10,
+                    new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null)));
+        }
+        System.out.println("Составные числительные для двузначных чисел");
+        assertAll(() -> assertEquals("двадцать первые", RussianNumeral.getNumeral(21,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null))),
+                () -> assertEquals("сорок второй", RussianNumeral.getNumeral(42,
+                        new Declension(Gender.FEMININE, Case.DATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("тридцать третьем", RussianNumeral.getNumeral(33,
+                        new Declension(Gender.NEUTER, Case.PREPOSITIONAL, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("семьдесят третьего", RussianNumeral.getNumeral(73,
+                        new Declension(Gender.MASCULINE, Case.GENITIVE, Count.SINGULAR, Type.ORDINAL, null))));
+        System.out.println("Составные числительные для трёхзначных чисел");
+        assertAll(() -> assertEquals("сто двадцать пятая", RussianNumeral.getNumeral(125,
+                new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("девятьсот одиннадцатый", RussianNumeral.getNumeral(911,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("двести третья", RussianNumeral.getNumeral(203,
+                        new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("пятьсот тридцатые", RussianNumeral.getNumeral(530,
+                        new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null))));
+        System.out.println("Составные числительные для чисел с последним классом");
+        assertAll(() -> assertEquals("одна тысяча девятьсот сорок первый", RussianNumeral.getNumeral(1941,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("две тысячи двадцатому", RussianNumeral.getNumeral(2020,
+                        new Declension(Gender.MASCULINE, Case.DATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("тысяча пятисотой", RussianNumeral.getNumeral(1500,
+                        new Declension(Gender.FEMININE, Case.PREPOSITIONAL, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("двадцать миллионов сто пятьдесят две тысячи трёхсотому",
+                        RussianNumeral.getNumeral(20152300,
+                                new Declension(Gender.MASCULINE, Case.DATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("один миллион одна тысяча девятисотых",
+                        RussianNumeral.getNumeral(1001900,
+                                new Declension(Gender.MASCULINE, Case.GENITIVE, Count.PLURAL, Type.ORDINAL, null))));
+        System.out.println("Сложные числительные");
+        assertAll(() -> assertEquals("десятитысячный", RussianNumeral.getNumeral(10000,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("одиннадцатитысячный", RussianNumeral.getNumeral(11000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("девятнадцатитысячный", RussianNumeral.getNumeral(19000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("двадцатитысячный", RussianNumeral.getNumeral(20000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("двадцатидвухтысячный", RussianNumeral.getNumeral(22000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("стодвухтысячный", RussianNumeral.getNumeral(102000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("стодвадцатитысячный", RussianNumeral.getNumeral(120000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("стосорокашестимиллионный", RussianNumeral.getNumeral(146000000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("два миллиарда стосорокасемимиллионный", RussianNumeral.getNumeral(2147000000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("два миллиарда сто сорок семь миллионов однотысячный",
+                        RussianNumeral.getNumeral(2147001000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))));
+        System.out.println("Исключения для сложных числительных");
+        assertAll(() -> assertEquals("двадцатиоднотысячный", RussianNumeral.getNumeral(21000,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("девяностомиллионная", RussianNumeral.getNumeral(90000000,
+                        new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("стотысячные", RussianNumeral.getNumeral(100000,
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null))),
+                () -> assertEquals("стодевяностооднотысячное", RussianNumeral.getNumeral(191000,
+                        new Declension(Gender.NEUTER, Case.ACCUSATIVE, Count.SINGULAR, Type.ORDINAL, null))));
     }
     @Test
     @DisplayName("Целые количественные числительные")
