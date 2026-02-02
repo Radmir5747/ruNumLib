@@ -21,7 +21,62 @@ class RussianNumeralTest {
         assertAll(() -> assertEquals("минус один", RussianNumeral.getNumeral(-1,
                 new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.CARDINAL, null))),
                 () -> assertEquals("минус первый", RussianNumeral.getNumeral(-1,
-                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))));
+                        new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null))),
+                () -> assertEquals("минус пять седьмых",
+                        RussianNumeral.getNumeral(new Fraction(-5, 7),
+                                new Declension(null, Case.NOMINATIVE, null, null, null))),
+                () -> assertEquals("минус две целых одна пятая",
+                        RussianNumeral.getNumeral(new Fraction(-2,1, 5),
+                                new Declension(null, Case.NOMINATIVE, null, null, null))));
+    }
+
+    @Test
+    @DisplayName("Проверка дробей")
+    void fractionCheck() {
+        Fraction f1 = new Fraction(1, 7); // 1/7
+        Fraction f2 = new Fraction(5, 10); // 5/10
+        Fraction f3 = new Fraction(1, 2, 5); // 1 2/5
+        Fraction f4 = new Fraction(3, 2, 9); // 3 2/9
+        String[] test1 = {"одна седьмая", "одной седьмой", "одной седьмой", "одну седьмую", "одной седьмой",
+                "одной седьмой"};
+        String[] test2 = {"пять десятых", "пяти десятых", "пяти десятым", "пять десятых", "пятью десятыми",
+                "пяти десятых"};
+        String[] test3 = {"одна целая две пятых", "одной целой двух пятых", "одной целой двум пятым",
+                "одну целую две пятых", "одной целой двумя пятыми", "одной целой двух пятых"};
+        String[] test4 = {"три целых две девятых", "трёх целых двух девятых", "трём целым двум девятым",
+                "три целых две девятых", "тремя целыми двумя девятыми", "трёх целых двух девятых"};
+        System.out.println("Простая дробь, 1 в числителе");
+        for (Case c : Case.values()) {
+            assertEquals(test1[c.ordinal()], RussianNumeral.getNumeral(f1, new DeclensionBuilder(c).build()));
+        }
+        System.out.println("Простая дробь");
+        for (Case c : Case.values()) {
+            assertEquals(test2[c.ordinal()], RussianNumeral.getNumeral(f2, new DeclensionBuilder(c).build()));
+        }
+        System.out.println("Составная дробь, 1 в целой части");
+        for (Case c : Case.values()) {
+            assertEquals(test3[c.ordinal()], RussianNumeral.getNumeral(f3, new DeclensionBuilder(c).build()));
+        }
+        System.out.println("Составная дробь");
+        for (Case c : Case.values()) {
+            assertEquals(test4[c.ordinal()], RussianNumeral.getNumeral(f4, new DeclensionBuilder(c).build()));
+        }
+        System.out.println("Проверка чисел 11, 21, 101, 111, 121 в числителе");
+        assertAll(() -> assertEquals("одиннадцать седьмых",
+                RussianNumeral.getNumeral(new Fraction(11 ,7),
+                        new DeclensionBuilder(Case.NOMINATIVE).build())),
+                () -> assertEquals("двадцать одна седьмая",
+                        RussianNumeral.getNumeral(new Fraction(21 ,7),
+                                new DeclensionBuilder(Case.NOMINATIVE).build())),
+                () -> assertEquals("сто одна седьмая",
+                        RussianNumeral.getNumeral(new Fraction(101 ,7),
+                                new DeclensionBuilder(Case.NOMINATIVE).build())),
+                () -> assertEquals("сто одиннадцать седьмых",
+                        RussianNumeral.getNumeral(new Fraction(111 ,7),
+                                new DeclensionBuilder(Case.NOMINATIVE).build())),
+                () -> assertEquals("сто двадцать одна седьмая",
+                        RussianNumeral.getNumeral(new Fraction(121 ,7),
+                                new DeclensionBuilder(Case.NOMINATIVE).build())));
     }
 
     @Test
