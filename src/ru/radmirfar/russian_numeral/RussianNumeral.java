@@ -21,20 +21,6 @@ public class RussianNumeral {
         return (negative ? "минус " : "") + getOrdinalNumeral(num, d);
     }
 
-    /* дробные числительные бывают только количественными */
-    /**
-     * <p>Выдаёт дробное количественное числительное в нужном падеже.</p>
-     * <p>При отсутствии падежа выдаёт исключение.</p>
-     * @param num десятичная дробь
-     * @param d грамматические признаки (падеж)
-     * @return число прописью
-     * @throws IllegalArgumentException если отсутствует падеж
-     */
-    public static String getNumeral(double num, Declension d) {
-        String res = "";
-        return res;
-    }
-
     /**
      * <p>Выдаёт дробное количественное числительное в нужном падеже.</p>
      * <p>При отсутствии падежа выдаёт исключение.</p>
