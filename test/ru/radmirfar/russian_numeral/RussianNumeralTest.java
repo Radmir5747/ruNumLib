@@ -3,9 +3,43 @@ package ru.radmirfar.russian_numeral;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RussianNumeralTest {
+
+    /**
+     * Выдаёт все падежные формы дробного числительного.
+     * @param num экземпляр класса Fraction
+     * @return список с падежными формами
+     */
+    ArrayList<String> getAllCases(Fraction num) {
+        ArrayList<String> res = new ArrayList<>();
+        for (Case c : Case.values()) {
+            res.add(RussianNumeral.getNumeral(num, new DeclensionBuilder(c).build()));
+        }
+        return res;
+    }
+
+    /**
+     * Выдаёт все падежные формы числительного, принимает на вход клише с грамматическими характеристиками.
+     * @param num число
+     * @param baseDeclension клише с грамматическими характеристиками
+     * @param skipAccusative пропускать форму винительного падежа
+     * @return список с падежными формами
+     */
+    ArrayList<String> getAllCases(int num, Declension baseDeclension, boolean skipAccusative) {
+        ArrayList<String> res = new ArrayList<>();
+        for (Case c : Case.values()) {
+            if (skipAccusative && c == Case.ACCUSATIVE) {
+                res.add("");
+                continue;
+            }
+            res.add(RussianNumeral.getNumeral(num, new DeclensionBuilder(baseDeclension).gramCase(c).build()));
+        }
+        return res;
+    }
 
     @Test
     @DisplayName("Проверка исключений при отсутствии падежа")
@@ -37,30 +71,24 @@ class RussianNumeralTest {
         Fraction f2 = new Fraction(5, 10); // 5/10
         Fraction f3 = new Fraction(1, 2, 5); // 1 2/5
         Fraction f4 = new Fraction(3, 2, 9); // 3 2/9
-        String[] test1 = {"одна седьмая", "одной седьмой", "одной седьмой", "одну седьмую", "одной седьмой",
-                "одной седьмой"};
-        String[] test2 = {"пять десятых", "пяти десятых", "пяти десятым", "пять десятых", "пятью десятыми",
-                "пяти десятых"};
-        String[] test3 = {"одна целая две пятых", "одной целой двух пятых", "одной целой двум пятым",
-                "одну целую две пятых", "одной целой двумя пятыми", "одной целой двух пятых"};
-        String[] test4 = {"три целых две девятых", "трёх целых двух девятых", "трём целым двум девятым",
-                "три целых две девятых", "тремя целыми двумя девятыми", "трёх целых двух девятых"};
+        ArrayList<String> test1 = new ArrayList<>(), test2 = new ArrayList<>(), test3 = new ArrayList<>(),
+                test4 = new ArrayList<>();
+        Collections.addAll(test1, "одна седьмая", "одной седьмой", "одной седьмой", "одну седьмую",
+                "одной седьмой", "одной седьмой");
+        Collections.addAll(test2, "пять десятых", "пяти десятых", "пяти десятым", "пять десятых",
+                "пятью десятыми", "пяти десятых");
+        Collections.addAll(test3, "одна целая две пятых", "одной целой двух пятых", "одной целой двум пятым",
+                "одну целую две пятых", "одной целой двумя пятыми", "одной целой двух пятых");
+        Collections.addAll(test4, "три целых две девятых", "трёх целых двух девятых", "трём целым двум девятым",
+                "три целых две девятых", "тремя целыми двумя девятыми", "трёх целых двух девятых");
         System.out.println("Простая дробь, 1 в числителе");
-        for (Case c : Case.values()) {
-            assertEquals(test1[c.ordinal()], RussianNumeral.getNumeral(f1, new DeclensionBuilder(c).build()));
-        }
+        assertLinesMatch(test1, getAllCases(f1));
         System.out.println("Простая дробь");
-        for (Case c : Case.values()) {
-            assertEquals(test2[c.ordinal()], RussianNumeral.getNumeral(f2, new DeclensionBuilder(c).build()));
-        }
+        assertLinesMatch(test2, getAllCases(f2));
         System.out.println("Составная дробь, 1 в целой части");
-        for (Case c : Case.values()) {
-            assertEquals(test3[c.ordinal()], RussianNumeral.getNumeral(f3, new DeclensionBuilder(c).build()));
-        }
+        assertLinesMatch(test3, getAllCases(f3));
         System.out.println("Составная дробь");
-        for (Case c : Case.values()) {
-            assertEquals(test4[c.ordinal()], RussianNumeral.getNumeral(f4, new DeclensionBuilder(c).build()));
-        }
+        assertLinesMatch(test4, getAllCases(f4));
         System.out.println("Проверка чисел 11, 21, 101, 111, 121 в числителе");
         assertAll(() -> assertEquals("одиннадцать седьмых",
                 RussianNumeral.getNumeral(new Fraction(11 ,7),
@@ -95,22 +123,20 @@ class RussianNumeralTest {
         Declension d4 = new Declension(Gender.MASCULINE, Case.NOMINATIVE, null, Type.ORDINAL, null);
         assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d4));
         System.out.println("Формы числительного третий");
-        String[][] third = {{"третий", "третьего", "третьему", "", "третьим", "третьем"},
-                {"третья", "третьей", "третьей", "третью", "третьей", "третьей"},
-                {"третье", "третьего", "третьему", "третье", "третьим", "третьем"},
-                {"третьи", "третьих", "третьим", "", "третьими", "третьих"}};
-        for (Case c : Case.values()) {
-            assertEquals(third[1][c.ordinal()], RussianNumeral.getNumeral(3,
-                    new Declension(Gender.FEMININE, c, Count.SINGULAR, Type.ORDINAL, null)));
-            assertEquals(third[2][c.ordinal()], RussianNumeral.getNumeral(3,
-                    new Declension(Gender.NEUTER, c, Count.SINGULAR, Type.ORDINAL, null)));
-            if (c != Case.ACCUSATIVE) {
-                assertEquals(third[0][c.ordinal()], RussianNumeral.getNumeral(3,
-                        new Declension(Gender.MASCULINE, c, Count.SINGULAR, Type.ORDINAL, null)));
-                assertEquals(third[3][c.ordinal()], RussianNumeral.getNumeral(3,
-                        new Declension(Gender.FEMININE, c, Count.PLURAL, Type.ORDINAL, null)));
-            }
-        }
+        ArrayList<String> third_1 = new ArrayList<>(), third_2 = new ArrayList<>(), third_3 = new ArrayList<>(),
+                third_4 = new ArrayList<>();
+        Collections.addAll(third_1, "третий", "третьего", "третьему", "", "третьим", "третьем");
+        Collections.addAll(third_2, "третья", "третьей", "третьей", "третью", "третьей", "третьей");
+        Collections.addAll(third_3, "третье", "третьего", "третьему", "третье", "третьим", "третьем");
+        Collections.addAll(third_4, "третьи", "третьих", "третьим", "", "третьими", "третьих");
+        assertLinesMatch(third_2, getAllCases(3,
+                new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null),false));
+        assertLinesMatch(third_3, getAllCases(3,
+                new Declension(Gender.NEUTER, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null),false));
+        assertLinesMatch(third_1, getAllCases(3,
+                new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), true));
+        assertLinesMatch(third_4,
+                getAllCases(3, new Declension(Gender.FEMININE, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), true));
         System.out.println("Формы винительного падежа должны отличаться в зависимости от одушевлённости");
         for (Count cnt : Count.values()) {
             String result1 = RussianNumeral.getNumeral(3,
@@ -148,23 +174,24 @@ class RussianNumeralTest {
             assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
         }
         System.out.println("Проверка числительных, оканчивающихся на -ый");
-        String[][] test4 = {{"первый", "первого", "первому", "", "первым", "первом"},
-                {"четвёртый", "четвёртого", "четвёртому", "", "четвёртым", "четвёртом"},
-                {"десятый", "десятого", "десятому", "", "десятым", "десятом"},
-                {"девяностый", "девяностого", "девяностому", "", "девяностым", "девяностом"},
-                {"сотый", "сотого", "сотому", "", "сотым", "сотом"},
-                {"трёхсотый", "трёхсотого", "трёхсотому", "", "трёхсотым", "трёхсотом"},
-                {"тысячный", "тысячного", "тысячному", "", "тысячным", "тысячном"},
-                {"миллионный", "миллионного", "миллионному", "", "миллионным", "миллионном"},
-                {"миллиардный", "миллиардного", "миллиардному", "", "миллиардным", "миллиардном"}
-        };
         int[] ints2 = {1, 4, 10, 90, 100, 300, 1000, (int)10e5, (int)10e8};
+        ArrayList<ArrayList<String>> yi_tests = new ArrayList<>();
         for (int i = 0; i < ints2.length; i++) {
-            for (Case c : Case.values()) {
-                if (c == Case.ACCUSATIVE) continue;
-                assertEquals(test4[i][c.ordinal()], RussianNumeral.getNumeral(ints2[i],
-                        new Declension(Gender.MASCULINE, c, Count.SINGULAR, Type.ORDINAL, null)));
-            }
+            yi_tests.add(new ArrayList<>());
+        }
+        Collections.addAll(yi_tests.get(0),"первый", "первого", "первому", "", "первым", "первом" );
+        Collections.addAll(yi_tests.get(1), "четвёртый", "четвёртого", "четвёртому", "", "четвёртым", "четвёртом");
+        Collections.addAll(yi_tests.get(2), "десятый", "десятого", "десятому", "", "десятым", "десятом");
+        Collections.addAll(yi_tests.get(3), "девяностый", "девяностого", "девяностому", "", "девяностым", "девяностом");
+        Collections.addAll(yi_tests.get(4), "сотый", "сотого", "сотому", "", "сотым", "сотом");
+        Collections.addAll(yi_tests.get(5), "трёхсотый", "трёхсотого", "трёхсотому", "", "трёхсотым", "трёхсотом");
+        Collections.addAll(yi_tests.get(6), "тысячный", "тысячного", "тысячному", "", "тысячным", "тысячном");
+        Collections.addAll(yi_tests.get(7), "миллионный", "миллионного", "миллионному", "", "миллионным", "миллионном");
+        Collections.addAll(yi_tests.get(8), "миллиардный", "миллиардного", "миллиардному", "", "миллиардным", "миллиардном");
+        for (int i = 0; i < ints2.length; i++) {
+            assertLinesMatch(yi_tests.get(i),
+                    getAllCases(ints2[i], new Declension(Gender.MASCULINE, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null),
+                    true));
             for (Count cnt : Count.values()) {
                 String result1 = RussianNumeral.getNumeral(ints2[i],
                         new Declension(Gender.MASCULINE, Case.ACCUSATIVE, cnt, Type.ORDINAL, Animacy.INANIMATE));
@@ -271,11 +298,10 @@ class RussianNumeralTest {
             }
         }
         System.out.println("Формы числительного ноль");
-        String[] nullForms = {"ноль", "ноля", "нолю", "ноль", "нолём", "ноле"};
-        for (Case c : Case.values()) {
-            assertEquals(nullForms[c.ordinal()], RussianNumeral.getNumeral(0,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        ArrayList<String> nullForms = new ArrayList<>();
+        Collections.addAll(nullForms, "ноль", "ноля", "нолю", "ноль", "нолём", "ноле");
+        assertLinesMatch(nullForms, getAllCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Exception'ы для числительного один");
         System.out.println("Отсутствует всё, должен выдать IllegalArgumentException");
         assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1, d1));
@@ -338,23 +364,18 @@ class RussianNumeralTest {
         System.out.println("Без одушевлённости в винительном падеже должен выдать IllegalArgumentException");
         assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(4, d5));
         System.out.println("Склонение числа восемь");
-        String[] eightForms = {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
-        for (Case c : Case.values()) {
-            assertEquals(eightForms[c.ordinal()], RussianNumeral.getNumeral(8,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        ArrayList<String> eightForms = new ArrayList<>(), tenForms = new ArrayList<>(), fiftyForms = new ArrayList<>();
+        Collections.addAll(eightForms, "восемь", "восьми", "восьми", "восемь", "восемью", "восьми");
+        assertLinesMatch(eightForms, getAllCases(8,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Числа 5-20, 30 (на примере десяти)");
-        String[] tenForms = {"десять", "десяти", "десяти", "десять", "десятью", "десяти"};
-        for (Case c : Case.values()) {
-            assertEquals(tenForms[c.ordinal()], RussianNumeral.getNumeral(10,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        Collections.addAll(tenForms, "десять", "десяти", "десяти", "десять", "десятью", "десяти");
+        assertLinesMatch(tenForms, getAllCases(10,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Числа 50, 60, 70, 80 (на примере пятидесяти)");
-        String[] fiftyForms = {"пятьдесят", "пятидесяти", "пятидесяти", "пятьдесят", "пятьюдесятью", "пятидесяти"};
-        for (Case c : Case.values()) {
-            assertEquals(fiftyForms[c.ordinal()], RussianNumeral.getNumeral(50,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        Collections.addAll(fiftyForms, "пятьдесят", "пятидесяти", "пятидесяти", "пятьдесят", "пятьюдесятью", "пятидесяти");
+        assertLinesMatch(fiftyForms, getAllCases(50,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Числа 40, 90, 100 должны иметь две формы");
         assertAll(() -> assertEquals("сорок", RussianNumeral.getNumeral(40, d1)),
                 () -> assertEquals("девяносто", RussianNumeral.getNumeral(90, d1)),
@@ -374,35 +395,29 @@ class RussianNumeralTest {
             }
         }
         System.out.println("Формы числительного двести");
-        String[] twoHundredForms = {"двести", "двухсот", "двумстам", "двести", "двумястами", "двухстах"};
-        for (Case c : Case.values()) {
-            assertEquals(twoHundredForms[c.ordinal()], RussianNumeral.getNumeral(200,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        ArrayList<String> twoHundredForms = new ArrayList<>(), threeHundredForms = new ArrayList<>(),
+                six_seven = new ArrayList<>(), seventyThreeForms = new ArrayList<>();
+        Collections.addAll(twoHundredForms, "двести", "двухсот", "двумстам", "двести", "двумястами", "двухстах");
+        assertLinesMatch(twoHundredForms, getAllCases(200,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Формы числительного триста");
-        String[] threeHundredForms = {"триста", "трёхсот", "трёмстам", "триста", "тремястами", "трёхстах"};
-        for (Case c : Case.values()) {
-            assertEquals(threeHundredForms[c.ordinal()], RussianNumeral.getNumeral(300,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        Collections.addAll(threeHundredForms, "триста", "трёхсот", "трёмстам", "триста", "тремястами", "трёхстах");
+        assertLinesMatch(threeHundredForms, getAllCases(300,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Составные числительные от двузначных чисел");
-        String[] six_seven = {"шестьдесят семь", "шестидесяти семи", "шестидесяти семи", "шестьдесят семь",
-                "шестьюдесятью семью", "шестидесяти семи"};
-        for (Case c : Case.values()) {
-            assertEquals(six_seven[c.ordinal()], RussianNumeral.getNumeral(67,
-                    new Declension(null, c, null, Type.CARDINAL, null)));
-        }
+        Collections.addAll(six_seven, "шестьдесят семь", "шестидесяти семи", "шестидесяти семи",
+                "шестьдесят семь", "шестьюдесятью семью", "шестидесяти семи");
+        assertLinesMatch(six_seven, getAllCases(67,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("У составных числительных не учитываем одушевлённость...");
-        String[] seventyThreeForms = {"семьдесят три", "семидесяти трёх", "семидесяти трём", "семьдесят три",
-                "семьюдесятью тремя", "семидесяти трёх"};
-        for (Case c : Case.values()) {
-            assertAll(() -> assertEquals(seventyThreeForms[c.ordinal()], RussianNumeral.getNumeral(73,
-                    new Declension(null, c, null, Type.CARDINAL, null))),
-                    () -> assertEquals(seventyThreeForms[c.ordinal()], RussianNumeral.getNumeral(73,
-                            new Declension(null, c, null, Type.CARDINAL, Animacy.INANIMATE))),
-                    () -> assertEquals(seventyThreeForms[c.ordinal()], RussianNumeral.getNumeral(73,
-                            new Declension(null, c, null, Type.CARDINAL, Animacy.ANIMATE))));
-        }
+        Collections.addAll(seventyThreeForms, "семьдесят три", "семидесяти трёх", "семидесяти трём",
+                "семьдесят три", "семьюдесятью тремя", "семидесяти трёх");
+        assertAll(() -> assertLinesMatch(seventyThreeForms, getAllCases(73,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false)),
+                () -> assertLinesMatch(seventyThreeForms, getAllCases(73,
+                        new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, Animacy.INANIMATE), false)),
+                () -> assertLinesMatch(seventyThreeForms, getAllCases(73,
+                        new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, Animacy.ANIMATE), false)));
         assertEquals("две тысячи двести пятьдесят три", RussianNumeral.getNumeral(2253,
                 new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE)));
         System.out.println("...только если они не оканчиваются на один");
@@ -415,40 +430,35 @@ class RussianNumeralTest {
                 () -> assertEquals("двадцать одних", RussianNumeral.getNumeral(21,
                         new Declension(Gender.MASCULINE, Case.ACCUSATIVE, Count.PLURAL, Type.CARDINAL, Animacy.ANIMATE))));
         System.out.println("Составные числительные от трёхзначных чисел");
-        String[] six_six_six = {"шестьсот шестьдесят шесть", "шестисот шестидесяти шести",
+        ArrayList<String> six_six_six = new ArrayList<>(), four_twenty = new ArrayList<>(), test = new ArrayList<>(),
+                test2 = new ArrayList<>(), test3 = new ArrayList<>();
+        Collections.addAll(six_six_six, "шестьсот шестьдесят шесть", "шестисот шестидесяти шести",
                 "шестистам шестидесяти шести", "шестьсот шестьдесят шесть", "шестьюстами шестьюдесятью шестью",
-                "шестистах шестидесяти шести"};
-        String[] four_twenty = {"четыреста двадцать", "четырёхсот двадцати", "четырёмстам двадцати", "четыреста двадцать",
-                "четырьмястами двадцатью", "четырёхстах двадцати"};
-        for (Case c : Case.values()) {
-            assertAll(() -> assertEquals(six_six_six[c.ordinal()], RussianNumeral.getNumeral(666,
-                            new Declension(null, c, null, Type.CARDINAL, null))),
-                    () -> assertEquals(four_twenty[c.ordinal()], RussianNumeral.getNumeral(420,
-                            new Declension(null, c, null, Type.CARDINAL, null))));
-        }
+                "шестистах шестидесяти шести");
+        assertLinesMatch(six_six_six, getAllCases(666,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
+        Collections.addAll(four_twenty, "четыреста двадцать", "четырёхсот двадцати", "четырёмстам двадцати",
+                "четыреста двадцать", "четырьмястами двадцатью", "четырёхстах двадцати");
+        assertLinesMatch(four_twenty, getAllCases(420,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), false));
         System.out.println("Составные числительные для крупных чисел (несколько классов)");
-        String[] test = {"два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь",
+        Collections.addAll(test,
+                "два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь",
                 "двух миллиардов ста сорока семи миллионов четырёхсот восьмидесяти трёх тысяч шестисот сорока семи",
                 "двум миллиардам ста сорока семи миллионам четырёмстам восьмидесяти трём тысячам шестистам сорока семи",
                 "два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь",
                 "двумя миллиардами ста сорока семью миллионами четырьмястами восемьюдесятью тремя тысячами шестьюстами сорока семью",
-                "двух миллиардах ста сорока семи миллионах четырёхстах восьмидесяти трёх тысячах шестистах сорока семи"};
-        for (Case c : Case.values()) {
-            assertEquals(test[c.ordinal()], RussianNumeral.getNumeral(Integer.MAX_VALUE, new Declension(null, c,
-                    null, Type.CARDINAL, null)));
-        }
-        String[] test2 = {"двести тысяч", "двухсот тысяч", "двумстам тысячам", "двести тысяч", "двумястами тысячами",
-                "двухстах тысячах"};
-        for (Case c : Case.values()) {
-            assertEquals(test2[c.ordinal()], RussianNumeral.getNumeral(200000, new Declension(null, c,
-                    null, Type.CARDINAL, null)));
-        }
-        String[] test3 = {"сто миллионов", "ста миллионов", "ста миллионам", "сто миллионов", "ста миллионами",
-                "ста миллионах"};
-        for (Case c : Case.values()) {
-            assertEquals(test3[c.ordinal()], RussianNumeral.getNumeral(100000000, new Declension(null, c,
-                    null, Type.CARDINAL, null)));
-        }
+                "двух миллиардах ста сорока семи миллионах четырёхстах восьмидесяти трёх тысячах шестистах сорока семи");
+        assertLinesMatch(test, getAllCases(Integer.MAX_VALUE, new Declension(null, Case.NOMINATIVE,
+                null, Type.CARDINAL, null), false));
+        Collections.addAll(test2, "двести тысяч", "двухсот тысяч", "двумстам тысячам", "двести тысяч",
+                "двумястами тысячами", "двухстах тысячах");
+        assertLinesMatch(test2, getAllCases(200000, new Declension(null, Case.NOMINATIVE,
+                null, Type.CARDINAL, null), false));
+        Collections.addAll(test3, "сто миллионов", "ста миллионов", "ста миллионам", "сто миллионов",
+                "ста миллионами", "ста миллионах");
+        assertLinesMatch(test3, getAllCases(100000000, new Declension(null, Case.NOMINATIVE,
+                null, Type.CARDINAL, null), false));
         System.out.println("Пустые классы пропускаются");
         assertEquals("девятнадцать миллионов шесть",
                 RussianNumeral.getNumeral(19000006, new Declension(null, Case.NOMINATIVE,null,
