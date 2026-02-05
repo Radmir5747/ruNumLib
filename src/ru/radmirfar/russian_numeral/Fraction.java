@@ -116,4 +116,13 @@ public class Fraction {
         setDenominator(denominator);
         setWhole(whole);
     }
+
+    @Override
+    public String toString() {
+        return "Fraction{" +
+                "whole=" + whole +
+                ", numerator=" + numerator +
+                ", denominator=" + denominator +
+                '}';
+    }
 }
