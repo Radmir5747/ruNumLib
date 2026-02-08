@@ -33,12 +33,7 @@ public class RussianNumeral {
         String res = "";
         // числитель и целая часть в форме единственного числа женского рода
         Declension baseDeclension =
-                new DeclensionBuilder(d).
-                        type(Type.CARDINAL).
-                        gender(Gender.FEMININE).
-                        count(Count.SINGULAR).
-                        animacy(Animacy.INANIMATE).
-                        build();
+                new Declension(Gender.FEMININE, d.gramCase, Count.SINGULAR, Type.CARDINAL, Animacy.INANIMATE);
         // TODO: сюда можно добавить возможность выбирать: ноль целых или ничего
         if (num.whole != 0) {
             // женский род, единственное число + неодушевлённость (одна целая, две целых)
@@ -54,6 +49,7 @@ public class RussianNumeral {
         Declension s = new DeclensionBuilder(Declension.supplementalDeclension(num.numerator, true, d)).
                 gender(Gender.FEMININE).
                 build();
+        // заплатка для множественного числа: в именительном и винительном падеже принимает форму родительного падежа
         if (s.isNomAcc() && s.count == Count.PLURAL) s = new DeclensionBuilder(s).gramCase(Case.GENITIVE).build();
         return res + getOrdinalNumeral(num.denominator, s);
     }
@@ -77,7 +73,7 @@ public class RussianNumeral {
         String res = COLLECTIVE_NUMERAL_BASES[num - 2];
         int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            return modifyForAnimacy(res, COLLECTIVE_NUM_ENDINGS[base], d);
+            return getAccusativeForm(res, COLLECTIVE_NUM_ENDINGS[base], d);
         }
         return res + COLLECTIVE_NUM_ENDINGS[base][d.gramCase.ordinal()];
     }
@@ -95,7 +91,7 @@ public class RussianNumeral {
         if (d.gender == null) throw new IllegalArgumentException("Missing gender");
         int base = d.gender == Gender.FEMININE ? 1 : 0; // в зависимости от рода используем набор окончаний
         if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            return modifyForAnimacy("об", BOTH_ENDINGS[base], d);
+            return getAccusativeForm("об", BOTH_ENDINGS[base], d);
         }
         return "об" + BOTH_ENDINGS[base][d.gramCase.ordinal()];
     }
@@ -139,7 +135,7 @@ public class RussianNumeral {
         int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
         if (num == 3) { // числительное третий использует набор мягких окончаний
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
-            if (d.adjCheck()) return modifyForAnimacy(ZERO_EIGHT_ORD_BASES[3], SOFT_ORD_ENDINGS[ending], d);
+            if (d.adjCheck()) return getAccusativeForm(ZERO_EIGHT_ORD_BASES[3], SOFT_ORD_ENDINGS[ending], d);
             return ZERO_EIGHT_ORD_BASES[3] + SOFT_ORD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         // эти числительные имеют окончание ой в начальной форме
@@ -153,14 +149,14 @@ public class RussianNumeral {
                  формы именительного или родительного падежа в зависимости от одушевлённости. Значения enum'а
                  для этих падежей - 0 и 1 соотв. Мы гарантированно не выйдем за пределы массива.
                 */
-                if (d.gramCase == Case.ACCUSATIVE) return modifyForAnimacy(res, new String[]{"ой", "ого"}, d);
+                if (d.gramCase == Case.ACCUSATIVE) return getAccusativeForm(res, new String[]{"ой", "ого"}, d);
             }
         }
         // получаем основы числительных 1, 4, 5-20, (3-9)0, (1-9)00, 1k, 1m, 1b
         res = res.isEmpty() ? getOrdBases(num) : res; // исключаем вероятно ошибочные 6-8
         if (!res.isEmpty()) { // если есть основа с твёрдыми окончаниями
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
-            if (d.adjCheck()) return modifyForAnimacy(res, HARD_ORD_ENDINGS[ending], d);
+            if (d.adjCheck()) return getAccusativeForm(res, HARD_ORD_ENDINGS[ending], d);
             // в остальных случаях используем стандартный набор твёрдых окончаний
             return res + HARD_ORD_ENDINGS[ending][d.gramCase.ordinal()];
         }
@@ -264,7 +260,7 @@ public class RussianNumeral {
             res = "од";
             int ending = d.count == Count.PLURAL ? 3 : d.gender.ordinal(); // выбираем набор окончаний
             // для винительного падежа у мужского рода и множественного числа учитываем одушевлённость
-            if (d.adjCheck()) return modifyForAnimacy(res, ONE_CARD_ENDINGS[ending], d);
+            if (d.adjCheck()) return getAccusativeForm(res, ONE_CARD_ENDINGS[ending], d);
             return res + ONE_CARD_ENDINGS[ending][d.gramCase.ordinal()];
         }
         if (num > 1 && num < 5) { // 2, 3, 4
@@ -272,7 +268,7 @@ public class RussianNumeral {
             int ending = num - 1;
             if (num == 2) ending = d.gender == Gender.FEMININE ? 1 : 0; // учитываем род для числ. 2
             if (d.gramCase == Case.ACCUSATIVE) { // у винительного падежа учитываем одушевлённость
-                return modifyForAnimacy(TWO_FOUR_CARD_BASES[num - 2], TWO_FOUR_CARD_ENDINGS[ending], d);
+                return getAccusativeForm(TWO_FOUR_CARD_BASES[num - 2], TWO_FOUR_CARD_ENDINGS[ending], d);
             }
             return TWO_FOUR_CARD_BASES[num - 2] + TWO_FOUR_CARD_ENDINGS[ending][d.gramCase.ordinal()];
         }
@@ -325,17 +321,17 @@ public class RussianNumeral {
         for (int i = nums.length - 1; i >= 0; i--) {
             if (nums[i] == 0) continue; // классы с нулём не отражаются на письме (*два миллиона ноль тысяч три)
             DeclensionBuilder baseDeclension = new DeclensionBuilder(d); // копируем исходные грамматические признаки
-            if (i != 0) { // последний разряд согласуется с существительным
+            if (i != 0) { // т.к. последний разряд согласуется с существительным, его хар-ки не меняем
                 baseDeclension.animacy(Animacy.INANIMATE); // снимаем одушевлённость (убить *трёх тысячи)
                 baseDeclension.count(Count.SINGULAR); // снимаем множественное число (*одни тысяча сто одни)
                 if (i == 1) baseDeclension.gender(Gender.FEMININE); // слово тысяча женского рода
-                else baseDeclension.gender(Gender.MASCULINE);
+                else baseDeclension.gender(Gender.MASCULINE); // остальные классы мужского
             }
             res += getCardinalNumeral(nums[i], baseDeclension.build()); // склоняем три цифры
             if (i == 0) continue; // единицы-десятки-сотни не имеют слова, отражающего разряд
             // склоняем разряд
-            res += " " + getCardinalNumeral((int)Math.pow(1000, i), Declension.supplementalDeclension(nums[i], i == 1,
-                            new DeclensionBuilder(d).build())) + " ";
+            res += " " + getCardinalNumeral((int)Math.pow(1000, i), Declension.supplementalDeclension(nums[i],
+                    i == 1, d)) + " ";
         }
         return res.strip(); // убираем лишние пробелы в конце
     }
@@ -363,7 +359,7 @@ public class RussianNumeral {
      * @param d грамматические признаки (одушевлённость)
      * @return число прописью
      */
-    private static String modifyForAnimacy(String base, String[] endings, Declension d) {
+    private static String getAccusativeForm(String base, String[] endings, Declension d) {
         if (d.animacy == null) throw new IllegalArgumentException("Missing animacy");
         // одушевлённое - окончание как у родительного падежа
         // неодушевлённое - как у именительного падежа
