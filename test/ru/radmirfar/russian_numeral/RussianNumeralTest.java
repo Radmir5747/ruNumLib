@@ -479,27 +479,27 @@ class RussianNumeralTest {
     @Test
     @DisplayName("Собирательные числительные")
     void getCollectiveNumeral() {
-        Declension nomDeclension = new Declension(null, Case.NOMINATIVE, null, null, null);
+        Declension nomDeclension = new Declension(null, Case.NOMINATIVE, null, Type.COLLECTIVE, null);
         System.out.println("Если число меньше 2 или больше 10, должен выдать IllegalArgumentException");
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getCollectiveNumeral(0, nomDeclension)),
-                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getCollectiveNumeral(12, nomDeclension)));
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(0, nomDeclension)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(12, nomDeclension)));
         System.out.println("Без одушевлённости в винительном падеже должен выдать IllegalArgumentException");
         Declension errDeclension = new Declension(null, Case.ACCUSATIVE, null, null, null);
-        assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getCollectiveNumeral(2, errDeclension));
+        assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(2, errDeclension));
         String[] strings = {"двое", "трое", "четверо", "пятеро", "шестеро", "семеро", "восьмеро", "девятеро", "десятеро"};
         System.out.println("Собирательные числительные от 2 до 10 в именительном падеже");
         for (int i = 2; i < 11; i++) {
-            assertEquals(strings[i - 2], RussianNumeral.getCollectiveNumeral(i, nomDeclension));
+            assertEquals(strings[i - 2], RussianNumeral.getNumeral(i, nomDeclension));
         }
         System.out.println("Формы винительного падежа должны отличаться в зависимости от одушевлённости");
-        Declension accInanDeclension = new Declension(null, Case.ACCUSATIVE, null, null, Animacy.INANIMATE);
-        Declension accAnDeclension = new Declension(null, Case.ACCUSATIVE, null, null, Animacy.ANIMATE);
-        Declension genDeclension = new Declension(null, Case.GENITIVE, null, null, null);
+        Declension accInanDeclension = new Declension(null, Case.ACCUSATIVE, null, Type.COLLECTIVE, Animacy.INANIMATE);
+        Declension accAnDeclension = new Declension(null, Case.ACCUSATIVE, null, Type.COLLECTIVE, Animacy.ANIMATE);
+        Declension genDeclension = new Declension(null, Case.GENITIVE, null, Type.COLLECTIVE, null);
         for (int i = 2; i < 11; i++) {
-            String result1 = RussianNumeral.getCollectiveNumeral(i, accInanDeclension);
-            String result2 = RussianNumeral.getCollectiveNumeral(i, accAnDeclension);
-            String expected1 = RussianNumeral.getCollectiveNumeral(i, nomDeclension);
-            String expected2 = RussianNumeral.getCollectiveNumeral(i, genDeclension);
+            String result1 = RussianNumeral.getNumeral(i, accInanDeclension);
+            String result2 = RussianNumeral.getNumeral(i, accAnDeclension);
+            String expected1 = RussianNumeral.getNumeral(i, nomDeclension);
+            String expected2 = RussianNumeral.getNumeral(i, genDeclension);
             assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
         }
     }

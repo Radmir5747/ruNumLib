@@ -12,6 +12,7 @@ public class RussianNumeral {
      */
     public static String getNumeral(int num, Declension d) {
         if (d.type == null) throw new IllegalArgumentException("Missing type of numeral");
+        if (d.type == Type.COLLECTIVE) return getCollectiveNumeral(num, d);
         boolean negative = false;
         if (num < 0) {
             negative = true;
@@ -52,30 +53,6 @@ public class RussianNumeral {
         // заплатка для множественного числа: в именительном и винительном падеже принимает форму родительного падежа
         if (s.isNomAcc() && s.count == Count.PLURAL) s = new DeclensionBuilder(s).gramCase(Case.GENITIVE).build();
         return res + getOrdinalNumeral(num.denominator, s);
-    }
-
-    /**
-     * <p>Выдаёт количественное собирательное числительное прописью в нужной форме.</p>
-     * <p>Необходимо передать падеж и одушевлённость существительного, к которому относится
-     * числительное, иначе выдаёт исключение.</p>
-     * <p>При передаче числа, не принадлежащего интервалу [2;10], выдаёт исключение
-     * (т.к. собирательные числительные больше десяти не употребляются,
-     * а меньше двух не бывают).</p>
-     *
-     * @param num число от 2 до 10
-     * @param d грамматические характеристики числительного (падеж, одушевлённость)
-     * @return число прописью
-     * @throws IllegalArgumentException если число меньше 2 или больше 10; отсутствуют
-     * необходимые грамматические характеристики.
-     */
-    public static String getCollectiveNumeral(int num, Declension d) {
-        if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
-        String res = COLLECTIVE_NUMERAL_BASES[num - 2];
-        int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
-        if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
-            return getAccusativeForm(res, COLLECTIVE_NUM_ENDINGS[base], d);
-        }
-        return res + COLLECTIVE_NUM_ENDINGS[base][d.gramCase.ordinal()];
     }
 
     /**
@@ -121,6 +98,31 @@ public class RussianNumeral {
     public static String get150(Declension d) {
         return getOneAndAHalf(new DeclensionBuilder(d.gramCase).gender(Gender.MASCULINE).build()) + "ста";
     }
+
+    /**
+     * <p>Выдаёт количественное собирательное числительное прописью в нужной форме.</p>
+     * <p>Необходимо передать падеж и одушевлённость существительного, к которому относится
+     * числительное, иначе выдаёт исключение.</p>
+     * <p>При передаче числа, не принадлежащего интервалу [2;10], выдаёт исключение
+     * (т.к. собирательные числительные больше десяти не употребляются,
+     * а меньше двух не бывают).</p>
+     *
+     * @param num число от 2 до 10
+     * @param d грамматические характеристики числительного (падеж, одушевлённость)
+     * @return число прописью
+     * @throws IllegalArgumentException если число меньше 2 или больше 10; отсутствуют
+     * необходимые грамматические характеристики.
+     */
+    private static String getCollectiveNumeral(int num, Declension d) {
+        if (num < 2 || num > 10) throw new IllegalArgumentException("Only numbers from 2 to 10 are supported");
+        String res = COLLECTIVE_NUMERAL_BASES[num - 2];
+        int base = num < 4 ? 0 : 1; // двое, трое - мягкая основа
+        if (d.gramCase == Case.ACCUSATIVE) { // для винительного падежа учитываем одушевлённость
+            return getAccusativeForm(res, COLLECTIVE_NUM_ENDINGS[base], d);
+        }
+        return res + COLLECTIVE_NUM_ENDINGS[base][d.gramCase.ordinal()];
+    }
+
     /**
      * Выдаёт порядковое числительное в нужной форме.
      * @param num число
