@@ -61,7 +61,12 @@ class RussianNumeralTest {
                                 new Declension(null, Case.NOMINATIVE, null, null, null))),
                 () -> assertEquals("минус две целых одна пятая",
                         RussianNumeral.getNumeral(new Fraction(-2,1, 5),
-                                new Declension(null, Case.NOMINATIVE, null, null, null))));
+                                new Declension(null, Case.NOMINATIVE, null, null, null))),
+                () -> assertEquals("минус два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь",
+                        RussianNumeral.getNumeral(Integer.MIN_VALUE + 1, new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null))));
+        System.out.println("TEMP: при передаче Integer.MIN_VALUE должен выдать IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () ->
+                RussianNumeral.getNumeral(Integer.MIN_VALUE, new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null)));
     }
 
     @Test

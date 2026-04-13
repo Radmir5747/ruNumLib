@@ -15,6 +15,7 @@ public class RussianNumeral {
         if (d.type == Type.COLLECTIVE) return getCollectiveNumeral(num, d);
         boolean negative = false;
         if (num < 0) {
+            if (num == Integer.MIN_VALUE) throw new IllegalArgumentException("This number is not supported"); // FIXME
             negative = true;
             num *= -1;
         }
