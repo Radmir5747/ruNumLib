@@ -2,6 +2,9 @@ package ru.radmirfar.russian_numeral;
 
 import static ru.radmirfar.russian_numeral.Consts.*;
 
+/**
+ * Основной класс, содержит статические методы по преобразованию чисел в текст
+ */
 public class RussianNumeral {
     /**
      * Выдаёт число прописью.
@@ -232,8 +235,8 @@ public class RussianNumeral {
             return getCardinalNumeral(num, GENITIVE_DECLENSION); // основа совпадает с числительным в родительном падеже
         }
         if (num == 1000) return "тысячн";
-        if (num == 10e5) return "миллионн";
-        if (num == 10e8) return "миллиардн";
+        if (num == 1_000_000) return "миллионн";
+        if (num == 1_000_000_000) return "миллиардн";
         return "";
     }
     /**
@@ -249,9 +252,9 @@ public class RussianNumeral {
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
             return "тысяч" + THOUSAND_CARD_ENDINGS[d.count.ordinal()][d.gramCase.ordinal()];
         }
-        if (num == 10e5 || num == 10e8) {
+        if (num == 1_000_000 || num == 1_000_000_000) {
             if (d.count == null) throw new IllegalArgumentException("Missing grammatical count");
-            res = num == 10e5 ? "миллион" : "миллиард";
+            res = num == 1_000_000 ? "миллион" : "миллиард";
             return res + MILLION_CARD_ENDINGS[d.count.ordinal()][d.gramCase.ordinal()];
         }
         if (num == 0) { // ноль - не числительное, но в его образовании участвует

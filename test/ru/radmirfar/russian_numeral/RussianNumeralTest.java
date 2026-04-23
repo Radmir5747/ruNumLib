@@ -179,7 +179,7 @@ class RussianNumeralTest {
             assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
         }
         System.out.println("Проверка числительных, оканчивающихся на -ый");
-        int[] ints2 = {1, 4, 10, 90, 100, 300, 1000, (int)10e5, (int)10e8};
+        int[] ints2 = {1, 4, 10, 90, 100, 300, 1000, (int)1_000_000, (int)1_000_000_000};
         ArrayList<ArrayList<String>> yi_tests = new ArrayList<>();
         for (int i = 0; i < ints2.length; i++) {
             yi_tests.add(new ArrayList<>());
@@ -284,8 +284,8 @@ class RussianNumeralTest {
                 "должен выдать IllegalArgumentException");
         Declension d1 = new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null);
         assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1000, d1)),
-                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)10e5, d1)),
-                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)10e8, d1)));
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)1_000_000, d1)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)1_000_000_000, d1)));
         System.out.println("Тысяча, миллион, миллиард");
         String[][][] strings1 = {{{"тысяча", "тысячи", "тысяче", "тысячу", "тысячей", "тысяче"},
                 {"тысячи", "тысяч", "тысячам", "тысячи", "тысячами", "тысячах"}},
@@ -293,7 +293,7 @@ class RussianNumeralTest {
                 {"миллионы", "миллионов", "миллионам", "миллионы", "миллионами", "миллионах"}},
         {{"миллиард", "миллиарда", "миллиарду", "миллиард", "миллиардом", "миллиарде"},
                 {"миллиарды", "миллиардов", "миллиардам", "миллиарды", "миллиардами", "миллиардах"}}};
-        int[] bigNums = new int[]{1000, (int) 10e5, (int) 10e8};
+        int[] bigNums = new int[]{1000, (int) 1_000_000, (int) 1_000_000_000};
         for (int i = 0; i < bigNums.length; i++) {
             for (Case c : Case.values()) {
                 for (Count cnt : Count.values()) {
