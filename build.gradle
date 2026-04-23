@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 group = 'ru.radmirfar'
@@ -7,6 +8,17 @@ version = '1.0.1'
 
 repositories {
     mavenCentral()
+}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 sourceSets {
     main {
