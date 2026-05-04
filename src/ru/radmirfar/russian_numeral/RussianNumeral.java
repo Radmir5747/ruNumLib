@@ -60,6 +60,47 @@ public class RussianNumeral {
     }
 
     /**
+     * Выдаёт согласованные числительное и существительное. Необходимо передать падеж и тип числительного, в случае
+     * порядкового числительного - грамматическое число, иначе выдаёт исключение.
+     * @param num число
+     * @param noun существительное
+     * @param d грамматические характеристики (тип числительного, падеж, грамматическое число)
+     * @return массив, в котором первый элемент - числительное, а второй - существительное
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
+     */
+    public static String[] getNumeralWithNoun(int num, Noun noun, Declension d) {
+        if (d.type == null) throw new IllegalArgumentException("Missing type of numeral");
+        if (d.type == Type.ORDINAL && d.count == null) throw new IllegalArgumentException("Missing count");
+        String[] res = new String[2];
+        // согласуем числительное в роде и переносим одушевлённость
+        DeclensionBuilder tempDeclension = new DeclensionBuilder(d).animacy(noun.animacy).gender(noun.gender);
+        // если числительное порядковое, то ещё и грамматическое число
+        if (d.type == Type.ORDINAL) tempDeclension.count(d.count);
+        if (d.type == Type.CARDINAL) {
+            if (noun.pluraliaTantum) tempDeclension.count(Count.PLURAL);
+            // заплатка для числа один: если существительное употребляется только не только во множественном числе,
+            // то ставим числительное в форму единственного числа.
+            // FIXME, когда будет исправлена связь между родом и грамматическим числом у числа один
+            else tempDeclension.count(Count.SINGULAR);
+        }
+        Declension s = tempDeclension.build();
+        // первый компонент - числительное
+        res[0] = getNumeral(num, s);
+        if (d.type == Type.ORDINAL) { // в порядковых числительных не нужно изменять форму в зависимости от числа
+            if (d.count == Count.SINGULAR) res[1] = noun.singularForms[d.gramCase.ordinal()];
+            else res[1] = noun.pluralForms[d.gramCase.ordinal()];
+        }
+        else {
+            Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, d);
+            if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
+            // так как мы используем особые падежные формы, восстанавливаем падеж
+            else if (noun.usePaucalForms) res[1] = noun.paucalForms[s.gramCase.ordinal()];
+            else res[1] = noun.pluralForms[s1.gramCase.ordinal()];
+        }
+        return res;
+    }
+
+    /**
      * <p>Выдаёт необходимую форму числительного <i>оба</i> в зависимости от грамматического рода,
      * падежа и одушевлённости существительного, к которому относится числительное.</p>
      * <p>Необходимо передать падеж, род, в случае винительного падежа также
@@ -337,7 +378,7 @@ public class RussianNumeral {
             if (i == 0) continue; // единицы-десятки-сотни не имеют слова, отражающего разряд
             // склоняем разряд
             res += " " + getCardinalNumeral((int)Math.pow(1000, i), Declension.supplementalDeclension(nums[i],
-                    i == 1, d)) + " ";
+                    i == 1, d)) + " "; // i == 1 => разряд - тысяча, женский род
         }
         return res.strip(); // убираем лишние пробелы в конце
     }

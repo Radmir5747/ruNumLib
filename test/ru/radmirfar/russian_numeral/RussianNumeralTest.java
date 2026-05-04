@@ -41,6 +41,22 @@ class RussianNumeralTest {
         return res;
     }
 
+    /**
+     * Выдаёт все падежные формы связки числительное + существительное, принимает на вход грамматические характеристики
+     * @param num число
+     * @param baseDeclension грамматические характеристики
+     * @param noun существительное
+     * @return список с падежными формами вида "числительное существительное"
+     */
+    ArrayList<String> getAllNumeralWithNounCases(int num, Declension baseDeclension, Noun noun) {
+        ArrayList<String> res = new ArrayList<>();
+        for (Case c : Case.values()) {
+            String[] tmp = RussianNumeral.getNumeralWithNoun(num, noun, new DeclensionBuilder(baseDeclension).gramCase(c).build());
+            res.add(tmp[0] + " " + tmp[1]);
+        }
+        return res;
+    }
+
     @Test
     @DisplayName("Проверка исключений при отсутствии падежа")
     void checkCaseExceptions() {
@@ -565,5 +581,23 @@ class RussianNumeralTest {
         Declension baseNomDeclension = new Declension(null, Case.NOMINATIVE, null, null, null);
         assertEquals("полутораста", RussianNumeral.get150(baseDeclension));
         assertEquals("полтораста", RussianNumeral.get150(baseNomDeclension));
+    }
+
+    @Test
+    @DisplayName("Согласование числительного и существительного")
+    void getNumeralWithNoun() {
+        Noun year = new Noun(Gender.MASCULINE, Animacy.INANIMATE,
+                new String[]{"год", "года", "году", "год", "годом", "годе"},
+                new String[]{"годы", "лет", "годам", "лет", "годами", "годах"});
+        ArrayList<String> correctYearForms1 = new ArrayList<>(), correctYearForms2 = new ArrayList<>(),
+                correctYearForms5 = new ArrayList<>();
+        Collections.addAll(correctYearForms1, "один год", "одного года", "одному году",
+                "один год", "одним годом", "одном годе");
+        Collections.addAll(correctYearForms2, /*"джва года"*/"два года", "двух лет", "двум годам", "два года",
+                "двумя годами", "двух годах");
+        Collections.addAll(correctYearForms5, "пять лет", "пяти лет", "пяти годам", "пять лет",
+                "пятью годами", "пяти годах");
+        assertLinesMatch(correctYearForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
     }
 }
