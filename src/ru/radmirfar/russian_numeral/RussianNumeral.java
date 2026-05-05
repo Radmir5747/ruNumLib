@@ -41,13 +41,8 @@ public class RussianNumeral {
                 new Declension(Gender.FEMININE, d.gramCase, Count.SINGULAR, Type.CARDINAL, Animacy.INANIMATE);
         // TODO: сюда можно добавить возможность выбирать: ноль целых или ничего
         if (num.whole != 0) {
-            // женский род, единственное число + неодушевлённость (одна целая, две целых)
-            res += getNumeral(num.whole, baseDeclension) + " ";
-            Declension s = Declension.supplementalDeclension(num.whole, true, d);
-            // заплатка для множественного числа: в именительном и винительном падеже принимает форму
-            // родительного падежа
-            if (s.isNomAcc() && s.count == Count.PLURAL) s = new DeclensionBuilder(s).gramCase(Case.GENITIVE).build();
-            res += "цел" + HARD_ORD_ENDINGS[s.count == Count.PLURAL ? 3 : 1][s.gramCase.ordinal()] + " ";
+            String[] parts = getNumeralWithNoun(num.whole, Consts.whole, baseDeclension);
+            res += parts[0] + " " + parts[1] + " ";
         }
         res += getNumeral(num.numerator, baseDeclension) + " "; // числитель
         // знаменатель

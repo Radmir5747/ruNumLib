@@ -166,4 +166,10 @@ public class Consts {
      * Склонение числительного <i>восемь</i>.
      */
     static final String[] EIGHT_CARD_CASES = {"восемь", "восьми", "восьми", "восемь", "восемью", "восьми"};
+    /**
+     *  Формы слова <i>целая</i>.
+     */
+    static final Noun whole = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+            new String[]{"целая", "целой", "целой", "целую", "целой", "целой"},
+            new String[]{"целых", "целых", "целым", "целых", "целыми", "целых"});
 }
