@@ -33,7 +33,7 @@ public class Noun {
      */
     boolean pluraliaTantum = false;
     /**
-     * Конструктор.
+     * Конструктор для существительных, которые употребляются как в единственном, так и во множественном числе.
      * @param gender род существительного
      * @param animacy одушевлённость существительного
      * @param singularForms массив с формами единственного числа
@@ -45,6 +45,19 @@ public class Noun {
         this.singularForms = singularForms;
         this.pluralForms = pluralForms;
     }
+    /**
+     * Конструктор для существительных, которые употребляются только во множественном числе (pluralia tantum).
+     * @param animacy одушевлённость существительного
+     * @param singularForms массив с формами единственного числа
+     * @param pluralForms массив с формами множественного числа
+     */
+    public Noun(Animacy animacy, String[] singularForms, String[] pluralForms) {
+        this.animacy = animacy;
+        this.singularForms = singularForms;
+        this.pluralForms = pluralForms;
+        pluraliaTantum = true;
+    }
+
     /**
      * Задаёт отдельные падежные формы для чисел 2-4
      * @param paucalForms массив с падежными формами
