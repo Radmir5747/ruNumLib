@@ -86,16 +86,18 @@ public class RussianNumeral {
         Declension s = tempDeclension.build();
         // первый компонент - числительное
         res[0] = getNumeral(num, s);
-        if (d.type == Type.ORDINAL) { // в порядковых числительных не нужно изменять форму в зависимости от числа
-            if (d.count == Count.SINGULAR) res[1] = noun.singularForms[d.gramCase.ordinal()];
-            else res[1] = noun.pluralForms[d.gramCase.ordinal()];
+        if (s.type == Type.ORDINAL) { // в порядковых числительных не нужно изменять форму в зависимости от числа
+            if (s.count == Count.SINGULAR) res[1] = noun.singularForms[s.gramCase.ordinal()];
+            else res[1] = noun.pluralForms[s.gramCase.ordinal()];
         }
         else {
-            Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, d);
-            if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
-            // так как мы используем особые падежные формы, восстанавливаем падеж
-            else if (noun.usePaucalForms) res[1] = noun.paucalForms[s.gramCase.ordinal()];
-            else res[1] = noun.pluralForms[s1.gramCase.ordinal()];
+            // если заданы особые формы для чисел 2-4, и число оканчивается на 2-4, используем их
+            if (Declension.isPaucal(num) && noun.usePaucalForms) res[1] = noun.paucalForms[s.gramCase.ordinal()];
+            else { // иначе согласуем существительное с числительным
+                Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, s);
+                if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
+                else res[1] = noun.pluralForms[s1.gramCase.ordinal()];
+            }
         }
         return res;
     }
@@ -378,13 +380,13 @@ public class RussianNumeral {
             if (i == 0) continue; // единицы-десятки-сотни не имеют слова, отражающего разряд
             // склоняем разряд
             res += " " + getCardinalNumeral((int)Math.pow(1000, i), Declension.supplementalDeclension(nums[i],
-                    i == 1, d)) + " "; // i == 1 => разряд - тысяча, женский род
+                    i == 1, baseDeclension.build())) + " "; // i == 1 => разряд - тысяча, женский род
         }
         return res.strip(); // убираем лишние пробелы в конце
     }
 
     /**
-     * Вспомогательная функция, разбивает число на разряды.
+     * Вспомогательная функция, разбивает число на разряды. Важно: разряды начинаются с последнего (самый высокий в конце).
      * @param num число
      * @return массив с разрядами числа
      */
