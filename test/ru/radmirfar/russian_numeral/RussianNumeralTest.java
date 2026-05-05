@@ -487,6 +487,10 @@ class RussianNumeralTest {
         System.out.println("С классов снимается одушевлённость: вижу две тысячи (человек)");
         assertAll(()-> assertEquals("две тысячи", RussianNumeral.getNumeral(2000,
                 new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
+                ()-> assertEquals("три тысячи", RussianNumeral.getNumeral(3000,
+                        new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
+                ()-> assertEquals("два миллиона", RussianNumeral.getNumeral(2000000,
+                        new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
                 ()-> assertEquals("три миллиона", RussianNumeral.getNumeral(3000000,
                         new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, Animacy.ANIMATE))),
                 ()-> assertEquals("четыреста двадцать две тысячи сто двадцать одного",
@@ -590,14 +594,195 @@ class RussianNumeralTest {
                 new String[]{"год", "года", "году", "год", "годом", "годе"},
                 new String[]{"годы", "лет", "годам", "лет", "годами", "годах"});
         ArrayList<String> correctYearForms1 = new ArrayList<>(), correctYearForms2 = new ArrayList<>(),
-                correctYearForms5 = new ArrayList<>();
+                correctYearForms5 = new ArrayList<>(), correctYearForms0 = new ArrayList<>();
         Collections.addAll(correctYearForms1, "один год", "одного года", "одному году",
                 "один год", "одним годом", "одном годе");
         Collections.addAll(correctYearForms2, /*"джва года"*/"два года", "двух лет", "двум годам", "два года",
                 "двумя годами", "двух годах");
         Collections.addAll(correctYearForms5, "пять лет", "пяти лет", "пяти годам", "пять лет",
                 "пятью годами", "пяти годах");
+        Collections.addAll(correctYearForms0, "ноль лет", "ноля лет", "нолю лет", "ноль лет",
+                "нолём лет", "ноле лет");
+        System.out.println("Мужской род, неодушевлённое (смешанные формы)");
         assertLinesMatch(correctYearForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
+        assertLinesMatch(correctYearForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
+        assertLinesMatch(correctYearForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
+        assertLinesMatch(correctYearForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
+        Noun hand = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+                new String[]{"рука", "руки", "руке", "руку", "рукой", "руке"},
+                new String[]{"руки", "рук", "рукам", "руки", "руками", "руках"});
+        ArrayList<String> correctHandForms1 = new ArrayList<>(), correctHandForms2 = new ArrayList<>(),
+                correctHandForms5 = new ArrayList<>(), correctHandForms0 = new ArrayList<>();
+        Collections.addAll(correctHandForms1, "одна рука", "одной руки", "одной руке", "одну руку",
+                "одной рукой", "одной руке");
+        Collections.addAll(correctHandForms2, "две руки", "двух рук", "двум рукам", "две руки",
+                "двумя руками", "двух руках");
+        Collections.addAll(correctHandForms5, "пять рук", "пяти рук", "пяти рукам", "пять рук",
+                "пятью руками", "пяти руках");
+        Collections.addAll(correctHandForms0, "ноль рук", "ноля рук", "нолю рук", "ноль рук",
+                "нолём рук", "ноле рук");
+        System.out.println("Женский род, неодушевлённое");
+        assertLinesMatch(correctHandForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
+        assertLinesMatch(correctHandForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
+        assertLinesMatch(correctHandForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
+        assertLinesMatch(correctHandForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
+        Noun girl = new Noun(Gender.FEMININE, Animacy.ANIMATE,
+                new String[]{"девочка", "девочки", "девочке", "девочку", "девочкой", "девочке"},
+                new String[]{"девочки", "девочек", "девочкам", "девочек", "девочками", "девочках"});
+        ArrayList<String> correctGirlForms1 = new ArrayList<>(), correctGirlForms2 = new ArrayList<>(),
+                correctGirlForms5 = new ArrayList<>(), correctGirlForms0 = new ArrayList<>();
+        Collections.addAll(correctGirlForms1, "одна девочка", "одной девочки", "одной девочке",
+                "одну девочку", "одной девочкой", "одной девочке");
+        Collections.addAll(correctGirlForms2, "две девочки", "двух девочек", "двум девочкам", "двух девочек",
+                "двумя девочками", "двух девочках");
+        Collections.addAll(correctGirlForms5, "пять девочек", "пяти девочек", "пяти девочкам", "пять девочек",
+                "пятью девочками", "пяти девочках");
+        Collections.addAll(correctGirlForms0, "ноль девочек", "ноля девочек", "нолю девочек", "ноль девочек",
+                "нолём девочек", "ноле девочек");
+        System.out.println("Женский род, одушевлённое");
+        assertLinesMatch(correctGirlForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
+        assertLinesMatch(correctGirlForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
+        assertLinesMatch(correctGirlForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
+        assertLinesMatch(correctGirlForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
+        Noun table = new Noun(Gender.MASCULINE, Animacy.INANIMATE,
+                new String[]{"стол", "стола", "столу", "стол", "столом", "столе"},
+                new String[]{"столы", "столов", "столам", "столы", "столами", "столах"});
+        ArrayList<String> correctTableForms1 = new ArrayList<>(), correctTableForms2 = new ArrayList<>(),
+                correctTableForms5 = new ArrayList<>(), correctTableForms0 = new ArrayList<>();
+        Collections.addAll(correctTableForms1, "один стол", "одного стола", "одному столу", "один стол",
+                "одним столом", "одном столе");
+        Collections.addAll(correctTableForms2, "два стола", "двух столов", "двум столам", "два стола",
+                "двумя столами", "двух столах");
+        Collections.addAll(correctTableForms5, "пять столов", "пяти столов", "пяти столам", "пять столов",
+                "пятью столами", "пяти столах");
+        Collections.addAll(correctTableForms0, "ноль столов", "ноля столов", "нолю столов", "ноль столов",
+                "нолём столов", "ноле столов");
+        System.out.println("Мужской род, неодушевлённое");
+        assertLinesMatch(correctTableForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
+        assertLinesMatch(correctTableForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
+        assertLinesMatch(correctTableForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
+        assertLinesMatch(correctTableForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
+        Noun boy = new Noun(Gender.MASCULINE, Animacy.ANIMATE,
+                new String[]{"мальчик", "мальчика", "мальчику", "мальчика", "мальчиком", "мальчике"},
+                new String[]{"мальчики", "мальчиков", "мальчикам", "мальчиков", "мальчиками", "мальчиках"});
+        ArrayList<String> correctBoyForms1 = new ArrayList<>(), correctBoyForms2 = new ArrayList<>(),
+                correctBoyForms5 = new ArrayList<>(), correctBoyForms0 = new ArrayList<>();
+        Collections.addAll(correctBoyForms1, "один мальчик", "одного мальчика", "одному мальчику",
+                "одного мальчика", "одним мальчиком", "одном мальчике");
+        Collections.addAll(correctBoyForms2, "два мальчика", "двух мальчиков", "двум мальчикам",
+                "двух мальчиков", "двумя мальчиками", "двух мальчиках");
+        Collections.addAll(correctBoyForms5, "пять мальчиков", "пяти мальчиков", "пяти мальчикам",
+                "пять мальчиков", "пятью мальчиками", "пяти мальчиках");
+        Collections.addAll(correctBoyForms0, "ноль мальчиков", "ноля мальчиков",
+                "нолю мальчиков", "ноль мальчиков", "нолём мальчиков", "ноле мальчиков");
+        System.out.println("Мужской род, одушевлённое");
+        assertLinesMatch(correctBoyForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
+        assertLinesMatch(correctBoyForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
+        assertLinesMatch(correctBoyForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
+        assertLinesMatch(correctBoyForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
+        Noun time = new Noun(Gender.NEUTER, Animacy.INANIMATE,
+                new String[]{"знамя", "знамени", "знамени", "знамя", "знаменем", "знамени"},
+                new String[]{"знамёна", "знамён", "знамёнам", "знамёна", "знамёнами", "знамёнах"});
+        ArrayList<String> correctTimeForms1 = new ArrayList<>(), correctTimeForms2 = new ArrayList<>(),
+                correctTimeForms5 = new ArrayList<>(), correctTimeForms0 = new ArrayList<>();
+        Collections.addAll(correctTimeForms1, "одно знамя", "одного знамени", "одному знамени", "одно знамя",
+                "одним знаменем", "одном знамени");
+        Collections.addAll(correctTimeForms2, "два знамени", "двух знамён", "двум знамёнам", "два знамени",
+                "двумя знамёнами", "двух знамёнах");
+        Collections.addAll(correctTimeForms5, "пять знамён", "пяти знамён", "пяти знамёнам", "пять знамён",
+                "пятью знамёнами", "пяти знамёнах");
+        Collections.addAll(correctTimeForms0, "ноль знамён", "ноля знамён", "нолю знамён", "ноль знамён",
+                "нолём знамён", "ноле знамён");
+        System.out.println("Средний род, неодушевлённое");
+        assertLinesMatch(correctTimeForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
+        assertLinesMatch(correctTimeForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
+        assertLinesMatch(correctTimeForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
+        assertLinesMatch(correctTimeForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
+        Noun face = new Noun(Gender.NEUTER, Animacy.ANIMATE, // лицо в значении человек (несколько незнакомых лиц)
+                new String[]{"лицо", "лица", "лицу", "лицо", "лицом", "лице"},
+                new String[]{"лица", "лиц", "лицам", "лица", "лицами", "лицах"});
+        ArrayList<String> correctFaceForms1 = new ArrayList<>(), correctFaceForms2 = new ArrayList<>(),
+                correctFaceForms5 = new ArrayList<>(), correctFaceForms0 = new ArrayList<>();
+        Collections.addAll(correctFaceForms1, "одно лицо", "одного лица", "одному лицу", "одно лицо",
+                "одним лицом", "одном лице");
+        Collections.addAll(correctFaceForms2, "два лица", "двух лиц", "двум лицам", "двух лиц",
+                "двумя лицами", "двух лицах");
+        Collections.addAll(correctFaceForms5, "пять лиц", "пяти лиц", "пяти лицам", "пять лиц",
+                "пятью лицами", "пяти лицах");
+        Collections.addAll(correctFaceForms0, "ноль лиц", "ноля лиц", "нолю лиц", "ноль лиц", "нолём лиц",
+                "ноле лиц");
+        System.out.println("Средний род, одушевлённое");
+        assertLinesMatch(correctFaceForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
+        assertLinesMatch(correctFaceForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
+        assertLinesMatch(correctFaceForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
+        assertLinesMatch(correctFaceForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
+        System.out.println("Дополнительные проверки");
+        Noun face_inan = new Noun(Gender.NEUTER, Animacy.INANIMATE, // лицо как часть тела
+                new String[]{"лицо", "лица", "лицу", "лицо", "лицом", "лице"},
+                new String[]{"лица", "лиц", "лицам", "лица", "лицами", "лицах"});
+        String[] test1 = RussianNumeral.getNumeralWithNoun(2, face_inan,
+                new Declension(null, Case.ACCUSATIVE, null, Type.CARDINAL, null));
+        assertEquals("два лица", test1[0] + " " + test1[1]);
+        String[] test4 = RussianNumeral.getNumeralWithNoun(1231, boy,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null));
+        assertEquals("одна тысяча двести тридцать один мальчик", test4[0] + " " + test4[1]);
+        String[] test2 = RussianNumeral.getNumeralWithNoun(1234, boy,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null));
+        assertEquals("одна тысяча двести тридцать четыре мальчика", test2[0] + " " + test2[1]);
+        String[] test3 = RussianNumeral.getNumeralWithNoun(1235, boy,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null));
+        assertEquals("одна тысяча двести тридцать пять мальчиков", test3[0] + " " + test3[1]);
+        System.out.println("Паукальная форма (согласование слова целая)");
+        Noun whole = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+                new String[]{"целая", "целой", "целой", "целую", "целой", "целой"},
+                new String[]{"целые", "целых", "целым", "целые", "целыми", "целых"});
+        // вводим паукальные счётные формы
+        whole.setPaucalForms(new String[]{"целых", "целых", "целым", "целых", "целыми", "целых"});
+        ArrayList<String> correctWholeForms1 = new ArrayList<>(), correctWholeForms2 = new ArrayList<>(),
+                correctWholeForms5 = new ArrayList<>(), correctWholeForms0 = new ArrayList<>();
+        Collections.addAll(correctWholeForms1, "одна целая", "одной целой", "одной целой", "одну целую",
+                "одной целой", "одной целой");
+        Collections.addAll(correctWholeForms2, "две целых", "двух целых", "двум целым", "две целых",
+                "двумя целыми", "двух целых");
+        Collections.addAll(correctWholeForms5, "пять целых", "пяти целых", "пяти целым", "пять целых",
+                "пятью целыми", "пяти целых");
+        Collections.addAll(correctWholeForms0, "ноль целых", "ноля целых", "нолю целых", "ноль целых",
+                "нолём целых", "ноле целых");
+        assertLinesMatch(correctWholeForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
+        assertLinesMatch(correctWholeForms2, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
+        assertLinesMatch(correctWholeForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
+        assertLinesMatch(correctWholeForms0, getAllNumeralWithNounCases(0,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
     }
 }
