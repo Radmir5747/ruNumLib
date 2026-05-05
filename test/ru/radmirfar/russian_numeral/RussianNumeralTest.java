@@ -592,9 +592,10 @@ class RussianNumeralTest {
     void getNumeralWithNoun() {
         Noun year = new Noun(Gender.MASCULINE, Animacy.INANIMATE,
                 new String[]{"год", "года", "году", "год", "годом", "годе"},
-                new String[]{"годы", "лет", "годам", "лет", "годами", "годах"});
+                new String[]{"годы", "лет", "годам", "годы", "годами", "годах"});
         ArrayList<String> correctYearForms1 = new ArrayList<>(), correctYearForms2 = new ArrayList<>(),
-                correctYearForms5 = new ArrayList<>(), correctYearForms0 = new ArrayList<>();
+                correctYearForms5 = new ArrayList<>(), correctYearForms0 = new ArrayList<>(),
+                yearOrdinalSingularForms = new ArrayList<>(), yearOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctYearForms1, "один год", "одного года", "одному году",
                 "один год", "одним годом", "одном годе");
         Collections.addAll(correctYearForms2, /*"джва года"*/"два года", "двух лет", "двум годам", "два года",
@@ -603,7 +604,12 @@ class RussianNumeralTest {
                 "пятью годами", "пяти годах");
         Collections.addAll(correctYearForms0, "ноль лет", "ноля лет", "нолю лет", "ноль лет",
                 "нолём лет", "ноле лет");
+        Collections.addAll(yearOrdinalSingularForms, "первый год", "первого года", "первому году",
+                "первый год", "первым годом", "первом годе");
+        Collections.addAll(yearOrdinalPluralForms, "первые годы", "первых лет", "первым годам",
+                "первые годы", "первыми годами", "первых годах");
         System.out.println("Мужской род, неодушевлённое (смешанные формы)");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctYearForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
         assertLinesMatch(correctYearForms2, getAllNumeralWithNounCases(2,
@@ -612,11 +618,17 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
         assertLinesMatch(correctYearForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), year));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(yearOrdinalSingularForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), year));
+        assertLinesMatch(yearOrdinalPluralForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), year));
         Noun hand = new Noun(Gender.FEMININE, Animacy.INANIMATE,
                 new String[]{"рука", "руки", "руке", "руку", "рукой", "руке"},
                 new String[]{"руки", "рук", "рукам", "руки", "руками", "руках"});
         ArrayList<String> correctHandForms1 = new ArrayList<>(), correctHandForms2 = new ArrayList<>(),
-                correctHandForms5 = new ArrayList<>(), correctHandForms0 = new ArrayList<>();
+                correctHandForms5 = new ArrayList<>(), correctHandForms0 = new ArrayList<>(),
+                handOrdinalSingularForms = new ArrayList<>(), handOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctHandForms1, "одна рука", "одной руки", "одной руке", "одну руку",
                 "одной рукой", "одной руке");
         Collections.addAll(correctHandForms2, "две руки", "двух рук", "двум рукам", "две руки",
@@ -625,7 +637,12 @@ class RussianNumeralTest {
                 "пятью руками", "пяти руках");
         Collections.addAll(correctHandForms0, "ноль рук", "ноля рук", "нолю рук", "ноль рук",
                 "нолём рук", "ноле рук");
+        Collections.addAll(handOrdinalSingularForms, "третья рука", "третьей руки", "третьей руке",
+                "третью руку", "третьей рукой", "третьей руке");
+        Collections.addAll(handOrdinalPluralForms, "третьи руки", "третьих рук", "третьим рукам",
+                "третьи руки", "третьими руками", "третьих руках");
         System.out.println("Женский род, неодушевлённое");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctHandForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
         assertLinesMatch(correctHandForms2, getAllNumeralWithNounCases(2,
@@ -634,11 +651,17 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
         assertLinesMatch(correctHandForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), hand));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(handOrdinalSingularForms, getAllNumeralWithNounCases(3,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), hand));
+        assertLinesMatch(handOrdinalPluralForms, getAllNumeralWithNounCases(3,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), hand));
         Noun girl = new Noun(Gender.FEMININE, Animacy.ANIMATE,
                 new String[]{"девочка", "девочки", "девочке", "девочку", "девочкой", "девочке"},
                 new String[]{"девочки", "девочек", "девочкам", "девочек", "девочками", "девочках"});
         ArrayList<String> correctGirlForms1 = new ArrayList<>(), correctGirlForms2 = new ArrayList<>(),
-                correctGirlForms5 = new ArrayList<>(), correctGirlForms0 = new ArrayList<>();
+                correctGirlForms5 = new ArrayList<>(), correctGirlForms0 = new ArrayList<>(),
+                girlOrdinalSingularForms = new ArrayList<>(), girlOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctGirlForms1, "одна девочка", "одной девочки", "одной девочке",
                 "одну девочку", "одной девочкой", "одной девочке");
         Collections.addAll(correctGirlForms2, "две девочки", "двух девочек", "двум девочкам", "двух девочек",
@@ -647,7 +670,12 @@ class RussianNumeralTest {
                 "пятью девочками", "пяти девочках");
         Collections.addAll(correctGirlForms0, "ноль девочек", "ноля девочек", "нолю девочек", "ноль девочек",
                 "нолём девочек", "ноле девочек");
+        Collections.addAll(girlOrdinalSingularForms, "пятая девочка", "пятой девочки", "пятой девочке",
+                "пятую девочку", "пятой девочкой", "пятой девочке");
+        Collections.addAll(girlOrdinalPluralForms, "пятые девочки", "пятых девочек", "пятым девочкам",
+                "пятых девочек", "пятыми девочками", "пятых девочках");
         System.out.println("Женский род, одушевлённое");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctGirlForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
         assertLinesMatch(correctGirlForms2, getAllNumeralWithNounCases(2,
@@ -656,11 +684,17 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
         assertLinesMatch(correctGirlForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), girl));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(girlOrdinalSingularForms, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), girl));
+        assertLinesMatch(girlOrdinalPluralForms, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), girl));
         Noun table = new Noun(Gender.MASCULINE, Animacy.INANIMATE,
                 new String[]{"стол", "стола", "столу", "стол", "столом", "столе"},
                 new String[]{"столы", "столов", "столам", "столы", "столами", "столах"});
         ArrayList<String> correctTableForms1 = new ArrayList<>(), correctTableForms2 = new ArrayList<>(),
-                correctTableForms5 = new ArrayList<>(), correctTableForms0 = new ArrayList<>();
+                correctTableForms5 = new ArrayList<>(), correctTableForms0 = new ArrayList<>(),
+                tableOrdinalSingularForms = new ArrayList<>(), tableOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctTableForms1, "один стол", "одного стола", "одному столу", "один стол",
                 "одним столом", "одном столе");
         Collections.addAll(correctTableForms2, "два стола", "двух столов", "двум столам", "два стола",
@@ -669,7 +703,12 @@ class RussianNumeralTest {
                 "пятью столами", "пяти столах");
         Collections.addAll(correctTableForms0, "ноль столов", "ноля столов", "нолю столов", "ноль столов",
                 "нолём столов", "ноле столов");
+        Collections.addAll(tableOrdinalSingularForms, "второй стол", "второго стола", "второму столу",
+                "второй стол", "вторым столом", "втором столе");
+        Collections.addAll(tableOrdinalPluralForms, "вторые столы", "вторых столов", "вторым столам",
+                "вторые столы", "вторыми столами", "вторых столах");
         System.out.println("Мужской род, неодушевлённое");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctTableForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
         assertLinesMatch(correctTableForms2, getAllNumeralWithNounCases(2,
@@ -678,11 +717,17 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
         assertLinesMatch(correctTableForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), table));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(tableOrdinalSingularForms, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), table));
+        assertLinesMatch(tableOrdinalPluralForms, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), table));
         Noun boy = new Noun(Gender.MASCULINE, Animacy.ANIMATE,
                 new String[]{"мальчик", "мальчика", "мальчику", "мальчика", "мальчиком", "мальчике"},
                 new String[]{"мальчики", "мальчиков", "мальчикам", "мальчиков", "мальчиками", "мальчиках"});
         ArrayList<String> correctBoyForms1 = new ArrayList<>(), correctBoyForms2 = new ArrayList<>(),
-                correctBoyForms5 = new ArrayList<>(), correctBoyForms0 = new ArrayList<>();
+                correctBoyForms5 = new ArrayList<>(), correctBoyForms0 = new ArrayList<>(),
+                boyOrdinalSingularForms = new ArrayList<>(), boyOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctBoyForms1, "один мальчик", "одного мальчика", "одному мальчику",
                 "одного мальчика", "одним мальчиком", "одном мальчике");
         Collections.addAll(correctBoyForms2, "два мальчика", "двух мальчиков", "двум мальчикам",
@@ -691,7 +736,12 @@ class RussianNumeralTest {
                 "пять мальчиков", "пятью мальчиками", "пяти мальчиках");
         Collections.addAll(correctBoyForms0, "ноль мальчиков", "ноля мальчиков",
                 "нолю мальчиков", "ноль мальчиков", "нолём мальчиков", "ноле мальчиков");
+        Collections.addAll(boyOrdinalSingularForms, "первый мальчик", "первого мальчика", "первому мальчику",
+                "первого мальчика", "первым мальчиком", "первом мальчике");
+        Collections.addAll(boyOrdinalPluralForms, "первые мальчики", "первых мальчиков", "первым мальчикам",
+                "первых мальчиков", "первыми мальчиками", "первых мальчиках");
         System.out.println("Мужской род, одушевлённое");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctBoyForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
         assertLinesMatch(correctBoyForms2, getAllNumeralWithNounCases(2,
@@ -700,6 +750,11 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
         assertLinesMatch(correctBoyForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), boy));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(boyOrdinalSingularForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), boy));
+        assertLinesMatch(boyOrdinalPluralForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), boy));
         Noun time = new Noun(Gender.NEUTER, Animacy.INANIMATE,
                 new String[]{"знамя", "знамени", "знамени", "знамя", "знаменем", "знамени"},
                 new String[]{"знамёна", "знамён", "знамёнам", "знамёна", "знамёнами", "знамёнах"});
