@@ -55,8 +55,9 @@ public class RussianNumeral {
     }
 
     /**
-     * Выдаёт согласованные числительное и существительное. Необходимо передать падеж и тип числительного, в случае
-     * порядкового числительного - грамматическое число, иначе выдаёт исключение.
+     * <p>Выдаёт согласованные числительное и существительное.</p>
+     * <p>Необходимо передать падеж и тип числительного, в случае порядкового числительного - грамматическое число,
+     * иначе выдаёт исключение.</p>
      * @param num число
      * @param noun существительное
      * @param d грамматические характеристики (тип числительного, падеж, грамматическое число)
@@ -78,22 +79,45 @@ public class RussianNumeral {
             // FIXME, когда будет исправлена связь между родом и грамматическим числом у числа один
             else tempDeclension.count(Count.SINGULAR);
         }
-        Declension s = tempDeclension.build();
+        Declension baseDeclension = tempDeclension.build();
         // первый компонент - числительное
-        res[0] = getNumeral(num, s);
-        if (s.type == Type.ORDINAL) { // в порядковых числительных не нужно изменять форму в зависимости от числа
-            if (s.count == Count.SINGULAR) res[1] = noun.singularForms[s.gramCase.ordinal()];
-            else res[1] = noun.pluralForms[s.gramCase.ordinal()];
+        res[0] = getNumeral(num, baseDeclension);
+        if (baseDeclension.type == Type.ORDINAL) { // в порядковых числительных не нужно изменять форму в зависимости от числа
+            if (baseDeclension.count == Count.SINGULAR) res[1] = noun.singularForms[baseDeclension.gramCase.ordinal()];
+            else res[1] = noun.pluralForms[baseDeclension.gramCase.ordinal()];
         }
         else {
             // если заданы особые формы для чисел 2-4, и число оканчивается на 2-4, используем их
-            if (Declension.isPaucal(num) && noun.usePaucalForms) res[1] = noun.paucalForms[s.gramCase.ordinal()];
+            if (Declension.isPaucal(num) && noun.usePaucalForms)
+                res[1] = noun.paucalForms[baseDeclension.gramCase.ordinal()];
             else { // иначе согласуем существительное с числительным
-                Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, s);
+                Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, baseDeclension);
                 if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
                 else res[1] = noun.pluralForms[s1.gramCase.ordinal()];
             }
         }
+        return res;
+    }
+
+    /**
+     * <p>Выдаёт согласованные дробное количественное числительное и существительное.</p>
+     * <p>Необходимо передать падеж и грамматическое число, иначе выдаёт исключение.</p>
+     * @param num простая или смешанная дробь
+     * @param noun существительное
+     * @param d грамматические характеристики (падеж, грамматическое число)
+     * @return массив, в котором первый элемент - числительное, а второй - существительное
+     * @throws IllegalArgumentException если отсутствуют необходимые грамматические характеристики
+     */
+    public static String[] getNumeralWithNoun(Fraction num, Noun noun, Declension d) {
+        // TODO: покрыть тестами
+        String[] res = new String[2];
+        res[0] = getNumeral(num, d);
+        /*
+         Дробные числительные всегда управляют Р. п. существительного, а его число зависит от смысла конструкции,
+         ср.: одна вторая конфеты — одна вторая конфет.
+         https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/grammaticheskie-priznaki-kolichestvennykh-chislitelnykh
+         */
+        res[1] = noun.getCaseForm(new DeclensionBuilder(d).gramCase(Case.GENITIVE).build());
         return res;
     }
 

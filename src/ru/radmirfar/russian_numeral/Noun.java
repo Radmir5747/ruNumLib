@@ -66,6 +66,19 @@ public class Noun {
         usePaucalForms = true;
         this.paucalForms = paucalForms;
     }
+
+    /**
+     * <p>Выдаёт падежную форму существительного в зависимости от падежа и грамматического числа.</p>
+     * <p>При отсутствии падежа и числа выдаёт исключение.</p>
+     * @param d грамматические характеристики (падеж, грамматическое число)
+     * @return падежная форма существительного
+     * @throws IllegalArgumentException если отсутствует падеж или грамматическое число
+     */
+    public String getCaseForm(Declension d) {
+        if (d.count == null) throw new IllegalArgumentException("Missing count");
+        if (d.count == Count.SINGULAR) return singularForms[d.gramCase.ordinal()];
+        return pluralForms[d.gramCase.ordinal()];
+    }
     /**
      * Указывает, употребляется ли существительное исключительно во множественном числе (как слово <i>брюки</i>)
      * @param pluraliaTantum true, если употребляется, в ином случае - false
