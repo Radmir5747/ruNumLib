@@ -48,12 +48,12 @@ public class Noun {
     /**
      * Конструктор для существительных, которые употребляются только во множественном числе (pluralia tantum).
      * @param animacy одушевлённость существительного
-     * @param singularForms массив с формами единственного числа
      * @param pluralForms массив с формами множественного числа
      */
-    public Noun(Animacy animacy, String[] singularForms, String[] pluralForms) {
+    public Noun(Animacy animacy, String[] pluralForms) {
+        this.gender = Gender.MASCULINE; // заплатка для числа один. FIXME, когда будет исправлено склонение числа один
         this.animacy = animacy;
-        this.singularForms = singularForms;
+        this.singularForms = pluralForms; // чтобы не было проблем с согласованием с числительными 1-4
         this.pluralForms = pluralForms;
         pluraliaTantum = true;
     }
@@ -75,16 +75,9 @@ public class Noun {
      * @throws IllegalArgumentException если отсутствует падеж или грамматическое число
      */
     public String getCaseForm(Declension d) {
-        if (d.count == null) throw new IllegalArgumentException("Missing count");
+        if (d.count == null && !pluraliaTantum) throw new IllegalArgumentException("Missing count");
         if (d.count == Count.SINGULAR) return singularForms[d.gramCase.ordinal()];
         return pluralForms[d.gramCase.ordinal()];
-    }
-    /**
-     * Указывает, употребляется ли существительное исключительно во множественном числе (как слово <i>брюки</i>).
-     * @param pluraliaTantum true, если употребляется, в ином случае - false
-     */
-    public void setPluraliaTantum(boolean pluraliaTantum) {
-        this.pluraliaTantum = pluraliaTantum;
     }
 
     /**

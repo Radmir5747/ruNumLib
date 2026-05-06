@@ -927,5 +927,21 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.COLLECTIVE, null), boy));
         assertLinesMatch(faceCollective, getAllNumeralWithNounCases(3,
                 new Declension(null, Case.NOMINATIVE, null, Type.COLLECTIVE, null), face));
+        System.out.println("Pluralia tantum");
+        Noun days = new Noun(Animacy.INANIMATE, new String[]{"сутки", "суток", "суткам", "сутки", "сутками", "сутках"});
+        ArrayList<String> correctDayForms1 = new ArrayList<>(), correctDayForms5 = new ArrayList<>(),
+                ordinalDayForms = new ArrayList<>();
+        Collections.addAll(correctDayForms1, "одни сутки", "одних суток", "одним суткам", "одни сутки",
+                "одними сутками", "одних сутках");
+        Collections.addAll(correctDayForms5, "пять суток", "пяти суток", "пяти суткам", "пять суток",
+                "пятью сутками", "пяти сутках");
+        Collections.addAll(ordinalDayForms, "первые сутки", "первых суток", "первым суткам", "первые сутки",
+                "первыми сутками", "первых сутках");
+        assertLinesMatch(correctDayForms1, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), days));
+        assertLinesMatch(correctDayForms5, getAllNumeralWithNounCases(5,
+                new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), days));
+        assertLinesMatch(ordinalDayForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, null, Type.ORDINAL, null), days));
     }
 }

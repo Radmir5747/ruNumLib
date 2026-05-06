@@ -66,12 +66,18 @@ public class RussianNumeral {
      */
     public static String[] getNumeralWithNoun(int num, Noun noun, Declension d) {
         if (d.type == null) throw new IllegalArgumentException("Missing type of numeral");
-        if (d.type == Type.ORDINAL && d.count == null) throw new IllegalArgumentException("Missing count");
+        // если числительное порядковое, грамматическое число не задано и существительное не pluralia tantum
+        if (d.type == Type.ORDINAL && d.count == null && !noun.pluraliaTantum) {
+            throw new IllegalArgumentException("Missing count");
+        }
         String[] res = new String[2];
         // согласуем числительное в роде и переносим одушевлённость
         DeclensionBuilder tempDeclension = new DeclensionBuilder(d).animacy(noun.animacy).gender(noun.gender);
         // если числительное порядковое, то ещё и грамматическое число
-        if (d.type == Type.ORDINAL) tempDeclension.count(d.count);
+        if (d.type == Type.ORDINAL) {
+            if (!noun.pluraliaTantum) tempDeclension.count(d.count);
+            else tempDeclension.count(Count.PLURAL);
+        }
         else if (d.type == Type.CARDINAL) {
             if (noun.pluraliaTantum) tempDeclension.count(Count.PLURAL);
             // заплатка для числа один: если существительное употребляется только не только во множественном числе,
@@ -88,11 +94,15 @@ public class RussianNumeral {
         }
         else {
             // если заданы особые формы для чисел 2-4, и число оканчивается на 2-4, используем их
-            if (Declension.isPaucal(num) && noun.usePaucalForms)
+            if (Declension.isPaucal(num) && noun.usePaucalForms) {
                 res[1] = noun.paucalForms[baseDeclension.gramCase.ordinal()];
+            }
+            // для собирательных числительных двое-четверо в именительном падеже используем родительный падеж
+            // множественного числа (исправление ошибки *двое мальчика)
             else if (Declension.isPaucal(num) && baseDeclension.gramCase == Case.NOMINATIVE
-                    && baseDeclension.type == Type.COLLECTIVE)
+                    && baseDeclension.type == Type.COLLECTIVE) {
                 res[1] = noun.getCaseForm(new DeclensionBuilder(Case.GENITIVE).count(Count.PLURAL).build());
+            }
             else { // иначе согласуем существительное с числительным
                 Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, baseDeclension);
                 if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
