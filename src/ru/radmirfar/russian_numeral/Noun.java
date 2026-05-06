@@ -29,7 +29,7 @@ public class Noun {
      */
     String[] pluralForms;
     /**
-     * Существительное может быть только во множественном числе (брюки, вилы).
+     * Существительное может быть только во множественном числе (брюки, вилы)
      */
     boolean pluraliaTantum = false;
     /**
@@ -59,7 +59,7 @@ public class Noun {
     }
 
     /**
-     * Задаёт отдельные падежные формы для чисел 2-4
+     * Задаёт отдельные падежные формы для чисел 2-4.
      * @param paucalForms массив с падежными формами
      */
     public void setPaucalForms(String[] paucalForms) {
@@ -80,14 +80,29 @@ public class Noun {
         return pluralForms[d.gramCase.ordinal()];
     }
     /**
-     * Указывает, употребляется ли существительное исключительно во множественном числе (как слово <i>брюки</i>)
+     * Указывает, употребляется ли существительное исключительно во множественном числе (как слово <i>брюки</i>).
      * @param pluraliaTantum true, если употребляется, в ином случае - false
      */
     public void setPluraliaTantum(boolean pluraliaTantum) {
         this.pluraliaTantum = pluraliaTantum;
     }
 
-    // заметка себе: одни очки, двое-четверо очков, пять-двадцать очков, двадцать одни очки, а дальше никак
+    /**
+     * Геттер рода.
+     * @return род существительного
+     */
+    public Gender getGender() {
+        return gender;
+    }
+
+    /**
+     * Геттер одушевлённости.
+     * @return одушевлённость существительного
+     */
+    public Animacy getAnimacy() {
+        return animacy;
+    }
+// заметка себе: одни очки, двое-четверо очков, пять-двадцать очков, двадцать одни очки, а дальше никак
     // https://gramota.ru/poisk?query=%D0%BD%D0%BE%D0%B6%D0%BD%D0%B8%D1%86&mode=spravka
     // и https://gramota.ru/spravka/vopros/320812#question
     // НО в косвенных падежах https://gramota.ru/spravka/vopros/259034#question

@@ -19,7 +19,7 @@ public class Fraction {
     int denominator;
 
     /**
-     * Геттер числителя дроби
+     * Геттер числителя дроби.
      * @return числитель
      */
     public int getNumerator() {
@@ -27,7 +27,7 @@ public class Fraction {
     }
 
     /**
-     * Сеттер числителя дроби
+     * Сеттер числителя дроби.
      * @param numerator числитель
      */
     public void setNumerator(int numerator) {
@@ -36,7 +36,7 @@ public class Fraction {
     }
 
     /**
-     * Геттер знаменателя дроби
+     * Геттер знаменателя дроби.
      * @return знаменатель
      */
     public int getDenominator() {
@@ -55,7 +55,7 @@ public class Fraction {
     }
 
     /**
-     * Геттер целой части смешанной дроби
+     * Геттер целой части смешанной дроби.
      * @return целое
      */
     public int getWhole() {
@@ -63,7 +63,7 @@ public class Fraction {
     }
 
     /**
-     * Сеттер целой части смешанной дроби
+     * Сеттер целой части смешанной дроби.
      * @param whole целое
      */
     public void setWhole(int whole) {
@@ -95,7 +95,7 @@ public class Fraction {
     }
 
     /**
-     * Конструктор для простой дроби
+     * Конструктор для простой дроби.
      * @param numerator числитель
      * @param denominator знаменатель
      */
@@ -106,7 +106,7 @@ public class Fraction {
     }
 
     /**
-     * Конструктор для смешанной дроби
+     * Конструктор для смешанной дроби.
      * @param whole целая часть
      * @param numerator числитель
      * @param denominator знаменатель
