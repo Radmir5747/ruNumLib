@@ -3,7 +3,8 @@
 [![NO AI](https://raw.githubusercontent.com/nuxy/no-ai-badge/master/badge.svg)](https://github.com/nuxy/no-ai-badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Позволяет получить порядковое или количественное числительное с учётом грамматических характеристик.
+Позволяет получить порядковое, количественное или собирательное числительное с учётом грамматических характеристик,
+а также согласовать числительное и существительное.
 
 ## Описание
 Поддерживаются порядковые, количественные целые и дробные, собирательные (_трое_, _оба/обе_ и т. д.) числительные.
@@ -23,12 +24,22 @@
 Код библиотеки полностью задокументирован с помощью javadoc.
 
 ## Использование
-Для получения числительного прописью в функцию `getNumeral` нужно передать грамматические характеристики, а также целое 
+
+### Получение числа прописью
+Для получения числа прописью в функцию `getNumeral` нужно передать грамматические характеристики, а также целое 
 число или [дробь](#описание-дробей). Также есть отдельные функции для получения форм числительных оба (`getBoth`),
 полтора (`getOneAndAHalf`), полтораста (`get150`), они принимают лишь грамматические характеристики.
 
-### Указание грамматических характеристик числительного
+### Согласование числительного и существительного
+Функция `getNumeralWithNoun` выдаёт массив, первый элемент которого - числительное, а второй - существительное. Функция
+принимает в качестве аргументов целое число или дробь, [существительное](#описание-существительных) и грамматические 
+характеристики: падеж, в который требуется поставить числительное и существительное, разряд числительного, 
+для порядковых и дробных числительных - грамматическое число (_первый человек - первые люди_, _одна вторая конфеты - 
+одна вторая конфет_).
+> [!TIP]
+> Если существительное употребляется только во множественном числе, то грамматическое число передавать не требуются.
 
+### Указание грамматических характеристик
 Грамматические характеристики описывает класс `Declension`.
 
 Обязательные характеристики для всех числительных - падеж и разряд. Например, чтобы получить количественное числительное
@@ -99,6 +110,16 @@ Fraction fraction = new Fraction(9, 3, 4); // 9 3/4
 > числитель, целая часть поменяет знак, а числитель станет положительным. Если задать положительный числитель и 
 > отрицательный знаменатель, то они "обменяются" знаками.
 
+### Описание существительных
+Для описания существительных используется класс `Noun`. Требуется задать род и одушевлённость существительного, а также
+передать падежные формы единственного и множественного числа. Если существительное употребляется только во множественном
+числе (_сутки, ножницы_), то требуется указать только одушевлённость и формы множественного числа.
+
+Имеется возможность задать отдельные падежные формы для чисел, оканчивающихся на 2, 3, 4, для этого используется функция 
+`setPaucalForms`.
+
+Функция `getCaseForm` выдаёт форму существительного в зависимости от падежа и грамматического числа.
+
 ### Примеры
 Количественные числительные:
 ```java
@@ -146,6 +167,90 @@ String s1 = RussianNumeral.getNumeral(new Fraction(3, 20, 100), new DeclensionBu
 System.out.println(s1); // тремя целыми двадцатью сотыми; творительный падеж
 String s2 = RussianNumeral.getNumeral(new Fraction(-3, 2), new DeclensionBuilder(Case.NOMINATIVE).build());
 System.out.println(s2); // минус три вторых; именительный падеж
+```
+Согласование числительного и существительного:
+```java
+// Количественные числительные:
+Noun year = new Noun(Gender.MASCULINE, Animacy.INANIMATE, new String[]{"год", "года", "году", "год", "годом", "годе"},
+        new String[]{"годы", "лет", "годам", "годы", "годами", "годах"});
+String[] s = RussianNumeral.getNumeralWithNoun(1, year,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s0 = RussianNumeral.getNumeralWithNoun(0, year,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s1 = RussianNumeral.getNumeralWithNoun(2, year,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s2 = RussianNumeral.getNumeralWithNoun(5, year,
+new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+System.out.println(s[0] + " " + s[1]); // один год
+System.out.println(s0[0] + " " + s0[1]); // ноль лет
+System.out.println(s1[0] + " " + s1[1]); // два года
+System.out.println(s2[0] + " " + s2[1]); // пять лет
+Noun boy = new Noun(Gender.MASCULINE, Animacy.ANIMATE,
+        new String[]{"мальчик", "мальчика", "мальчику", "мальчика", "мальчиком", "мальчике"},
+        new String[]{"мальчики", "мальчиков", "мальчикам", "мальчиков", "мальчиками", "мальчиках"});
+String[] s3 = RussianNumeral.getNumeralWithNoun(1, year,
+        new DeclensionBuilder(Case.ACCUSATIVE).type(Type.CARDINAL).build());
+String[] s4 = RussianNumeral.getNumeralWithNoun(1, boy,
+        new DeclensionBuilder(Case.ACCUSATIVE).type(Type.CARDINAL).build());
+String[] s5 = RussianNumeral.getNumeralWithNoun(2, year,
+        new DeclensionBuilder(Case.ACCUSATIVE).type(Type.CARDINAL).build());
+String[] s6 = RussianNumeral.getNumeralWithNoun(2, boy,
+        new DeclensionBuilder(Case.ACCUSATIVE).type(Type.CARDINAL).build());
+System.out.println(s3[0] + " " + s3[1]); // один год (винительный падеж)
+System.out.println(s4[0] + " " + s4[1]); // одного мальчика (винительный падеж)
+System.out.println(s5[0] + " " + s5[1]); // два года (винительный падеж)
+System.out.println(s6[0] + " " + s6[1]); // двух мальчиков (винительный падеж)
+String[] s7 = RussianNumeral.getNumeralWithNoun(0, year,
+        new DeclensionBuilder(Case.INSTRUMENTAL).type(Type.CARDINAL).build());
+System.out.println(s7[0] + " " + s7[1]); // нолём лет
+// Порядковые числительные
+String[] s8 = RussianNumeral.getNumeralWithNoun(1, year,
+        new DeclensionBuilder(Case.ACCUSATIVE).type(Type.ORDINAL).count(Count.SINGULAR).build());
+String[] s9 = RussianNumeral.getNumeralWithNoun(1, year,
+new DeclensionBuilder(Case.ACCUSATIVE).type(Type.ORDINAL).count(Count.PLURAL).build());
+System.out.println(s8[0] + " " + s8[1]); // первый год
+System.out.println(s9[0] + " " + s9[1]); // первые годы
+// Собирательные числительные
+String[] s10 = RussianNumeral.getNumeralWithNoun(2, boy,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.COLLECTIVE).build());
+        System.out.println(s10[0] + " " + s10[1]); // двое мальчиков
+// Дроби
+Noun candy = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+        new String[]{"конфета", "конфеты", "конфете", "конфету", "конфетой", "конфете"},
+        new String[]{"конфеты", "конфет", "конфетам", "конфеты", "конфетами", "конфетах"});
+Fraction half = new Fraction(1, 2);
+String[] s11 = RussianNumeral.getNumeralWithNoun(half, candy, 
+        new DeclensionBuilder(Case.ACCUSATIVE).count(Count.SINGULAR).build());
+String[] s12 = RussianNumeral.getNumeralWithNoun(half, candy,
+        new DeclensionBuilder(Case.ACCUSATIVE).count(Count.PLURAL).build());
+System.out.println(s11[0] + " " + s11[1]); // одну вторую конфеты
+System.out.println(s12[0] + " " + s12[1]); // одну вторую конфет
+// Отдельные формы для чисел 2, 3, 4
+Noun whole = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+        new String[]{"целая", "целой", "целой", "целую", "целой", "целой"},
+        new String[]{"целые", "целых", "целым", "целые", "целыми", "целых"});
+// формы для чисел 2, 3, 4
+        whole.setPaucalForms(new String[]{"целых", "целых", "целым", "целых", "целыми", "целых"});
+String[] s13 = RussianNumeral.getNumeralWithNoun(1, whole,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s14 = RussianNumeral.getNumeralWithNoun(2, whole,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s15 = RussianNumeral.getNumeralWithNoun(5, whole,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+        System.out.println(s13[0] + " " + s13[1]); // одна целая
+        System.out.println(s14[0] + " " + s14[1]); // две целых (не целые!)
+        System.out.println(s15[0] + " " + s15[1]); // пять целых
+// согласование с pluralia tantum
+Noun days = new Noun(Animacy.INANIMATE, new String[]{"сутки", "суток", "суткам", "сутки", "сутками", "сутках"});
+String[] s16 = RussianNumeral.getNumeralWithNoun(1, days,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s17 = RussianNumeral.getNumeralWithNoun(5, days,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.CARDINAL).build());
+String[] s18 = RussianNumeral.getNumeralWithNoun(1, days,
+        new DeclensionBuilder(Case.NOMINATIVE).type(Type.ORDINAL).build());
+System.out.println(s16[0] + " " + s16[1]); // одни сутки
+System.out.println(s17[0] + " " + s17[1]); // пять суток
+System.out.println(s18[0] + " " + s18[1]); // первые сутки
 ```
 ### Грамматические характеристики
 `Animacy` - одушевлённость существительного, к которому относится числительное; задаётся функцией `animacy()`:
