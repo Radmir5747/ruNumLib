@@ -119,6 +119,12 @@ public class Declension {
      */
     static Declension supplementalDeclension(int num, boolean isFeminine, Declension d) {
         /*
+         * При сочетании с существительными слова тысяча, миллион, миллиард и др. всегда управляют существительным,
+         * требуя его постановки в форме Р. п. мн. числа. - иными словами ведут себя как существительные
+         * https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/grammaticheskie-priznaki-kolichestvennykh-chislitelnykh
+         */
+        if (num % 1000 == 0) return new Declension(null, Case.GENITIVE, Count.PLURAL, null, null);
+        /*
          * Рассматриваем две последние цифры числа за исключением случаев, когда оно больше двух знаков и кратно 100
          * (для избежания ошибок типа 200 000 - *двумястами тысяч)
          */
