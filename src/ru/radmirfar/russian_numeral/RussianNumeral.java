@@ -72,7 +72,7 @@ public class RussianNumeral {
         DeclensionBuilder tempDeclension = new DeclensionBuilder(d).animacy(noun.animacy).gender(noun.gender);
         // если числительное порядковое, то ещё и грамматическое число
         if (d.type == Type.ORDINAL) tempDeclension.count(d.count);
-        if (d.type == Type.CARDINAL) {
+        else if (d.type == Type.CARDINAL) {
             if (noun.pluraliaTantum) tempDeclension.count(Count.PLURAL);
             // заплатка для числа один: если существительное употребляется только не только во множественном числе,
             // то ставим числительное в форму единственного числа.
@@ -90,6 +90,9 @@ public class RussianNumeral {
             // если заданы особые формы для чисел 2-4, и число оканчивается на 2-4, используем их
             if (Declension.isPaucal(num) && noun.usePaucalForms)
                 res[1] = noun.paucalForms[baseDeclension.gramCase.ordinal()];
+            else if (Declension.isPaucal(num) && baseDeclension.gramCase == Case.NOMINATIVE
+                    && baseDeclension.type == Type.COLLECTIVE)
+                res[1] = noun.getCaseForm(new DeclensionBuilder(Case.GENITIVE).count(Count.PLURAL).build());
             else { // иначе согласуем существительное с числительным
                 Declension s1 = Declension.supplementalDeclension(num, noun.gender == Gender.FEMININE, baseDeclension);
                 if (s1.count == Count.SINGULAR) res[1] = noun.singularForms[s1.gramCase.ordinal()];
