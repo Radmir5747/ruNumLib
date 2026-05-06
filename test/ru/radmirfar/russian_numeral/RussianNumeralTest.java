@@ -57,6 +57,22 @@ class RussianNumeralTest {
         return res;
     }
 
+    /**
+     * Выдаёт все падежные формы связки числительное + существительное, принимает на вход грамматические характеристики
+     * @param num число
+     * @param baseDeclension грамматические характеристики
+     * @param noun существительное
+     * @return список с падежными формами вида "числительное существительное"
+     */
+    ArrayList<String> getAllNumeralWithNounCases(Fraction num, Declension baseDeclension, Noun noun) {
+        ArrayList<String> res = new ArrayList<>();
+        for (Case c : Case.values()) {
+            String[] tmp = RussianNumeral.getNumeralWithNoun(num, noun, new DeclensionBuilder(baseDeclension).gramCase(c).build());
+            res.add(tmp[0] + " " + tmp[1]);
+        }
+        return res;
+    }
+
     @Test
     @DisplayName("Проверка исключений при отсутствии падежа")
     void checkCaseExceptions() {
@@ -195,7 +211,7 @@ class RussianNumeralTest {
             assertAll(() -> assertEquals(expected1, result1), () -> assertEquals(expected2, result2));
         }
         System.out.println("Проверка числительных, оканчивающихся на -ый");
-        int[] ints2 = {1, 4, 10, 90, 100, 300, 1000, (int)1_000_000, (int)1_000_000_000};
+        int[] ints2 = {1, 4, 10, 90, 100, 300, 1000, 1_000_000, 1_000_000_000};
         ArrayList<ArrayList<String>> yi_tests = new ArrayList<>();
         for (int i = 0; i < ints2.length; i++) {
             yi_tests.add(new ArrayList<>());
@@ -300,8 +316,8 @@ class RussianNumeralTest {
                 "должен выдать IllegalArgumentException");
         Declension d1 = new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null);
         assertAll(() -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1000, d1)),
-                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)1_000_000, d1)),
-                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral((int)1_000_000_000, d1)));
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1_000_000, d1)),
+                () -> assertThrows(IllegalArgumentException.class, () -> RussianNumeral.getNumeral(1_000_000_000, d1)));
         System.out.println("Тысяча, миллион, миллиард");
         String[][][] strings1 = {{{"тысяча", "тысячи", "тысяче", "тысячу", "тысячей", "тысяче"},
                 {"тысячи", "тысяч", "тысячам", "тысячи", "тысячами", "тысячах"}},
@@ -309,7 +325,7 @@ class RussianNumeralTest {
                 {"миллионы", "миллионов", "миллионам", "миллионы", "миллионами", "миллионах"}},
         {{"миллиард", "миллиарда", "миллиарду", "миллиард", "миллиардом", "миллиарде"},
                 {"миллиарды", "миллиардов", "миллиардам", "миллиарды", "миллиардами", "миллиардах"}}};
-        int[] bigNums = new int[]{1000, (int) 1_000_000, (int) 1_000_000_000};
+        int[] bigNums = new int[]{1000, 1_000_000, 1_000_000_000};
         for (int i = 0; i < bigNums.length; i++) {
             for (Case c : Case.values()) {
                 for (Count cnt : Count.values()) {
@@ -759,7 +775,8 @@ class RussianNumeralTest {
                 new String[]{"знамя", "знамени", "знамени", "знамя", "знаменем", "знамени"},
                 new String[]{"знамёна", "знамён", "знамёнам", "знамёна", "знамёнами", "знамёнах"});
         ArrayList<String> correctTimeForms1 = new ArrayList<>(), correctTimeForms2 = new ArrayList<>(),
-                correctTimeForms5 = new ArrayList<>(), correctTimeForms0 = new ArrayList<>();
+                correctTimeForms5 = new ArrayList<>(), correctTimeForms0 = new ArrayList<>(),
+                timeOrdinalSingularForms = new ArrayList<>(), timeOrdinalPluralForms = new ArrayList<>();
         Collections.addAll(correctTimeForms1, "одно знамя", "одного знамени", "одному знамени", "одно знамя",
                 "одним знаменем", "одном знамени");
         Collections.addAll(correctTimeForms2, "два знамени", "двух знамён", "двум знамёнам", "два знамени",
@@ -768,7 +785,12 @@ class RussianNumeralTest {
                 "пятью знамёнами", "пяти знамёнах");
         Collections.addAll(correctTimeForms0, "ноль знамён", "ноля знамён", "нолю знамён", "ноль знамён",
                 "нолём знамён", "ноле знамён");
+        Collections.addAll(timeOrdinalSingularForms, "первое знамя", "первого знамени", "первому знамени",
+                "первое знамя", "первым знаменем", "первом знамени");
+        Collections.addAll(timeOrdinalPluralForms, "первые знамёна", "первых знамён", "первым знамёнам",
+                "первые знамёна", "первыми знамёнами", "первых знамёнах");
         System.out.println("Средний род, неодушевлённое");
+        System.out.println("Количественные числительные");
         assertLinesMatch(correctTimeForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
         assertLinesMatch(correctTimeForms2, getAllNumeralWithNounCases(2,
@@ -777,11 +799,17 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
         assertLinesMatch(correctTimeForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), time));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(timeOrdinalSingularForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), time));
+        assertLinesMatch(timeOrdinalPluralForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), time));
         Noun face = new Noun(Gender.NEUTER, Animacy.ANIMATE, // лицо в значении человек (несколько незнакомых лиц)
                 new String[]{"лицо", "лица", "лицу", "лицо", "лицом", "лице"},
-                new String[]{"лица", "лиц", "лицам", "лица", "лицами", "лицах"});
+                new String[]{"лица", "лиц", "лицам", "лиц", "лицами", "лицах"});
         ArrayList<String> correctFaceForms1 = new ArrayList<>(), correctFaceForms2 = new ArrayList<>(),
-                correctFaceForms5 = new ArrayList<>(), correctFaceForms0 = new ArrayList<>();
+                correctFaceForms5 = new ArrayList<>(), correctFaceForms0 = new ArrayList<>(),
+                faceOrdinalSingularForms = new ArrayList<>(), faceOrdinalPluralForms = new ArrayList<>();;
         Collections.addAll(correctFaceForms1, "одно лицо", "одного лица", "одному лицу", "одно лицо",
                 "одним лицом", "одном лице");
         Collections.addAll(correctFaceForms2, "два лица", "двух лиц", "двум лицам", "двух лиц",
@@ -790,6 +818,10 @@ class RussianNumeralTest {
                 "пятью лицами", "пяти лицах");
         Collections.addAll(correctFaceForms0, "ноль лиц", "ноля лиц", "нолю лиц", "ноль лиц", "нолём лиц",
                 "ноле лиц");
+        Collections.addAll(faceOrdinalSingularForms, "первое лицо", "первого лица", "первому лицу",
+                "первое лицо", "первым лицом", "первом лице");
+        Collections.addAll(faceOrdinalPluralForms, "первые лица", "первых лиц", "первым лицам", "первых лиц",
+                "первыми лицами", "первых лицах");
         System.out.println("Средний род, одушевлённое");
         assertLinesMatch(correctFaceForms1, getAllNumeralWithNounCases(1,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
@@ -799,7 +831,13 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
         assertLinesMatch(correctFaceForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), face));
+        System.out.println("Порядковые числительные");
+        assertLinesMatch(faceOrdinalSingularForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, Type.ORDINAL, null), face));
+        assertLinesMatch(faceOrdinalPluralForms, getAllNumeralWithNounCases(1,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, Type.ORDINAL, null), face));
         System.out.println("Дополнительные проверки");
+        Declension genitive = new Declension(null, Case.GENITIVE, null, Type.CARDINAL, null);
         Noun face_inan = new Noun(Gender.NEUTER, Animacy.INANIMATE, // лицо как часть тела
                 new String[]{"лицо", "лица", "лицу", "лицо", "лицом", "лице"},
                 new String[]{"лица", "лиц", "лицам", "лица", "лицами", "лицах"});
@@ -815,6 +853,8 @@ class RussianNumeralTest {
         String[] test3 = RussianNumeral.getNumeralWithNoun(1235, boy,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null));
         assertEquals("одна тысяча двести тридцать пять мальчиков", test3[0] + " " + test3[1]);
+        String[] test3_0 = RussianNumeral.getNumeralWithNoun(1252, boy, genitive);
+        assertEquals("одной тысячи двухсот пятидесяти двух мальчиков", test3_0[0] + " " + test3_0[1]);
         System.out.println("Паукальная форма (согласование слова целая)");
         Noun whole = new Noun(Gender.FEMININE, Animacy.INANIMATE,
                 new String[]{"целая", "целой", "целой", "целую", "целой", "целой"},
@@ -839,5 +879,53 @@ class RussianNumeralTest {
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
         assertLinesMatch(correctWholeForms0, getAllNumeralWithNounCases(0,
                 new Declension(null, Case.NOMINATIVE, null, Type.CARDINAL, null), whole));
+        System.out.println("Согласование с дробью");
+        Noun candy = new Noun(Gender.FEMININE, Animacy.INANIMATE,
+                new String[]{"конфета", "конфеты", "конфете", "конфету", "конфетой", "конфете"},
+                new String[]{"конфеты", "конфет", "конфетам", "конфеты", "конфетами", "конфетах"});
+        Fraction oneHalf = new Fraction(1, 2);
+        ArrayList<String> candyFractionSingularForms = new ArrayList<>(), candyFractionPluralForms = new ArrayList<>();
+        Collections.addAll(candyFractionSingularForms, "одна вторая конфеты", "одной второй конфеты",
+                "одной второй конфеты", "одну вторую конфеты", "одной второй конфеты", "одной второй конфеты");
+        Collections.addAll(candyFractionPluralForms, "одна вторая конфет", "одной второй конфет",
+                "одной второй конфет", "одну вторую конфет", "одной второй конфет", "одной второй конфет");
+        assertLinesMatch(candyFractionSingularForms, getAllNumeralWithNounCases(oneHalf,
+                new Declension(null, Case.NOMINATIVE, Count.SINGULAR, null, null), candy));
+        assertLinesMatch(candyFractionPluralForms, getAllNumeralWithNounCases(oneHalf,
+                new Declension(null, Case.NOMINATIVE, Count.PLURAL, null, null), candy));
+        System.out.println("Согласование со словами тысяча, миллион");
+        // По мотивам Письмовника Грамоты.ру, раздел «Тысяче работникам» или «тысяче работников»?
+        // https://classic2.gramota.ru/spravka/letters/61-rubric-92
+        Declension dative = new Declension(null, Case.DATIVE, null, Type.CARDINAL, null);
+        Declension instrumental = new Declension(null, Case.INSTRUMENTAL, null, Type.CARDINAL, null);
+        Noun worker = new Noun(Gender.MASCULINE, Animacy.ANIMATE,
+                new String[]{"работник", "работника", "работнику", "работника", "работником", "работнике"},
+                new String[]{"работники", "работников", "работникам", "работников", "работниками", "работниках"});
+        String[] test5 = RussianNumeral.getNumeralWithNoun(1000, worker, dative);
+        String[] test6 = RussianNumeral.getNumeralWithNoun(1_000_000, worker, dative);
+        String[] test7 = RussianNumeral.getNumeralWithNoun(3000, worker, dative);
+        String[] test8 = RussianNumeral.getNumeralWithNoun(1000, worker, instrumental);
+        String[] test9 = RussianNumeral.getNumeralWithNoun(1_000_000, worker, instrumental);
+        String[] test10 = RussianNumeral.getNumeralWithNoun(3000, worker, instrumental);
+        String[] test11 = RussianNumeral.getNumeralWithNoun(25000, worker, dative);
+        String[] test12 = RussianNumeral.getNumeralWithNoun(25100, worker, dative);
+        assertAll(() -> assertEquals("тысяче работников", test5[0] + " " + test5[1]),
+                () -> assertEquals("миллиону работников", test6[0] + " " + test6[1]),
+                () -> assertEquals("трём тысячам работников", test7[0] + " " + test7[1]),
+                () -> assertEquals("тысячей работников", test8[0] + " " + test8[1]),
+                () -> assertEquals("миллионом работников", test9[0] + " " + test9[1]),
+                () -> assertEquals("тремя тысячами работников", test10[0] + " " + test10[1]),
+                () -> assertEquals("двадцати пяти тысячам работников", test11[0] + " " + test11[1]),
+                () -> assertEquals("двадцати пяти тысячам ста работникам", test12[0] + " " + test12[1]));
+        System.out.println("Собирательные числительные");
+        ArrayList<String> boyCollective = new ArrayList<>(), faceCollective = new ArrayList<>();
+        Collections.addAll(boyCollective, "двое мальчиков", "двоих мальчиков", "двоим мальчикам",
+                "двоих мальчиков", "двоими мальчиками", "двоих мальчиках");
+        Collections.addAll(faceCollective, "трое лиц", "троих лиц", "троим лицам", "троих лиц",
+                "троими лицами", "троих лицах");
+        assertLinesMatch(boyCollective, getAllNumeralWithNounCases(2,
+                new Declension(null, Case.NOMINATIVE, null, Type.COLLECTIVE, null), boy));
+        assertLinesMatch(faceCollective, getAllNumeralWithNounCases(3,
+                new Declension(null, Case.NOMINATIVE, null, Type.COLLECTIVE, null), face));
     }
 }
